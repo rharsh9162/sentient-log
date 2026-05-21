@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getLogs, getStats, type LogEvent } from '@/lib/api';
-import { Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Filter, Download } from 'lucide-react';
 
 export default function LogsPage() {
   const [events, setEvents] = useState<LogEvent[]>([]);
@@ -51,6 +51,27 @@ export default function LogsPage() {
     e.preventDefault();
     setSearch(searchInput);
     setPage(1);
+  };
+
+  const exportCSV = () => {
+    if (events.length === 0) return;
+    const headers = ['Timestamp', 'Type', 'URL', 'Latency (ms)', 'Status Code', 'Source/Domain'];
+    const rows = events.map((event) => [
+      new Date(event.timestamp).toISOString(),
+      event.event_type,
+      `"${(event.url || '').replace(/"/g, '""')}"`,
+      event.latency_ms,
+      event.status_code || '',
+      (event.metadata as Record<string, unknown>)?.domain as string || (event.metadata as Record<string, unknown>)?.source as string || '',
+    ]);
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sentientlog-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const formatTime = (ts: string) => {
@@ -112,6 +133,16 @@ export default function LogsPage() {
             />
           </div>
         </form>
+
+        <button
+          className="export-btn"
+          onClick={exportCSV}
+          disabled={loading || events.length === 0}
+          title="Export current logs as CSV"
+        >
+          <Download size={15} />
+          Export CSV
+        </button>
       </div>
 
       {/* Table */}

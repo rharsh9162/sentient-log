@@ -9,22 +9,21 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.3.7",
     "@google/generative-ai": "^0.24.1",
     "@tailwindcss/postcss": "^4.2.4",
     "autoprefixer": "^10.5.0",
-    "bcryptjs": "^3.0.3",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "mongoose": "^9.3.3",
     "next": "^16.2.4",
-    "next-auth": "^4.24.7",
     "postcss": "^8.5.14",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "resend": "^6.12.3"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

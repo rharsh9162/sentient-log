@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { UserButton, useClerk } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { getHealth, clearData } from '@/lib/api';
-import { User, LogOut, ChevronDown, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 export function Navbar() {
-  const { data: session } = useSession();
+  const { signOut } = useClerk();
+  const router = useRouter();
   const [status, setStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
-  const [menuOpen, setMenuOpen] = useState(false);
   const [clearing, setClearing] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -26,15 +27,7 @@ export function Navbar() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+
 
   const handleClear = async (action: 'clear_orphaned' | 'clear_mine') => {
     const label = action === 'clear_orphaned' ? 'old shared data' : 'all your data';
@@ -65,29 +58,27 @@ export function Navbar() {
       </div>
 
       <div className="navbar-right">
-        <div className="navbar-user" ref={menuRef}>
-          <button
-            className="navbar-user-btn"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <User size={15} />
-            <span>{session?.user?.name || 'User'}</span>
-            <ChevronDown size={14} />
-          </button>
-
-          {menuOpen && (
-            <div className="navbar-user-menu">
-              <button onClick={() => handleClear('clear_mine')} disabled={clearing}>
-                <Trash2 size={15} />
-                {clearing ? 'Clearing...' : 'Clear My Data'}
-              </button>
-              <div style={{ height: 1, background: '#1E1E2E', margin: '4px 0' }} />
-              <button onClick={() => signOut({ callbackUrl: '/login' })}>
-                <LogOut size={15} />
-                Sign Out
-              </button>
-            </div>
-          )}
+        <button 
+          className="export-btn" 
+          style={{ marginRight: '16px', background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+          onClick={() => handleClear('clear_mine')} 
+          disabled={clearing}
+        >
+          <Trash2 size={14} />
+          {clearing ? 'Clearing...' : 'Clear Data'}
+        </button>
+        <div className="navbar-user">
+          <UserButton 
+            afterSignOutUrl="/login"
+            appearance={{
+              elements: {
+                userButtonAvatarBox: {
+                  width: '32px',
+                  height: '32px',
+                }
+              }
+            }}
+          />
         </div>
       </div>
     </header>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Providers } from '@/components/Providers';
+import { ClerkProvider } from '@clerk/nextjs';
 
 export const metadata: Metadata = {
   title: 'SentientLog — AI-Powered Analytics',
@@ -13,10 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -150,3 +150,102 @@ export async function analyzeWebsite(url: string, maxPages: number = 15): Promis
 
 export type { LogEvent, LogsResponse, StatsResponse, HealthResponse, QueryResponse };
 
+// ===== ALERTS API =====
+
+export interface AlertRule {
+  _id: string;
+  user_id: string;
+  name: string;
+  domain: string;
+  metric: 'avg_latency' | 'error_rate' | 'slow_pages' | 'total_errors';
+  condition: 'gt' | 'lt';
+  threshold: number;
+  frequency: '15m' | 'daily' | 'weekly' | 'monthly';
+  enabled: boolean;
+  last_fired_at: string | null;
+  total_firings: number;
+  createdAt: string;
+}
+
+export interface AlertSummary {
+  total_rules: number;
+  active: number;
+  fired_today: number;
+  total_firings: number;
+}
+
+export interface AlertHistoryItem {
+  _id: string;
+  alert_id: string;
+  user_id: string;
+  rule_name: string;
+  domain: string;
+  metric: string;
+  measured_value: number;
+  threshold: number;
+  fired_at: string;
+}
+
+export async function getAlerts(): Promise<{ alerts: AlertRule[]; summary: AlertSummary }> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts`);
+  if (!res.ok) throw new Error('Failed to fetch alerts');
+  return res.json();
+}
+
+export async function createAlert(data: {
+  name: string;
+  domain: string;
+  metric: string;
+  condition: string;
+  threshold: number;
+  frequency: string;
+}): Promise<{ alert: AlertRule; message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(d.error || 'Failed to create alert');
+  }
+  return res.json();
+}
+
+export async function updateAlert(
+  id: string,
+  data: Partial<AlertRule>
+): Promise<{ alert: AlertRule }> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update alert');
+  return res.json();
+}
+
+export async function deleteAlert(id: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete alert');
+  return res.json();
+}
+
+export async function getAlertHistory(): Promise<{ history: AlertHistoryItem[] }> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts/history`);
+  if (!res.ok) throw new Error('Failed to fetch alert history');
+  return res.json();
+}
+
+export async function checkAlerts(): Promise<{
+  checked: number;
+  fired: number;
+  results: { name: string; fired: boolean; reason: string }[];
+}> {
+  const res = await fetch(`${API_BASE}/api/v1/alerts/check`, { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to check alerts');
+  return res.json();
+}
+

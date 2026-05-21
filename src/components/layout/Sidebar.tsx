@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ScrollText, BarChart3, MessageSquareText, Globe, Activity } from 'lucide-react';
+import { LayoutDashboard, ScrollText, BarChart3, MessageSquareText, Globe, Activity, Bell } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/analyze', label: 'Analyze Site', icon: Globe },
   { href: '/logs', label: 'Logs', icon: ScrollText },
   { href: '/charts', label: 'Charts', icon: BarChart3 },
+  { href: '/alerts', label: 'Alerts', icon: Bell },
   { href: '/ask', label: 'Ask AI', icon: MessageSquareText },
 ];
 

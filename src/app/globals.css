@@ -903,6 +903,39 @@ body {
   min-width: 240px;
 }
 
+/* ===== EXPORT BUTTON ===== */
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.export-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.08));
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.export-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ===== PAGINATION ===== */
 .pagination {
   display: flex;
@@ -1533,3 +1566,255 @@ body {
 .preview-kpis { display: flex; gap: 20px; }
 .preview-kpi-card { flex: 1; height: 100px; background: rgba(255,255,255,0.8); border: 1px solid white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
 .preview-chart { flex: 1; background: rgba(255,255,255,0.8); border: 1px solid white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+
+/* ===== ALERTS PAGE ===== */
+
+.alert-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, var(--primary), #4F46E5);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.alert-new-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4F46E5, #4338CA);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.alert-new-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Chip Filter Bar */
+.alert-chip-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.alert-chip {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: var(--text-muted);
+  background: var(--bg);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.alert-chip:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  color: var(--text-secondary);
+}
+
+.alert-chip-active {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.06);
+}
+
+/* Alert Rules List */
+.alert-rules-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.alert-rule-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.alert-rule-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Rule Icons */
+.alert-rule-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alert-rule-icon-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #10B981;
+}
+
+.alert-rule-icon-fired {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+.alert-rule-icon-paused {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748B;
+}
+
+/* Status Badges */
+.alert-badge {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.alert-badge-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+}
+
+.alert-badge-fired {
+  background: rgba(239, 68, 68, 0.08);
+  color: #DC2626;
+}
+
+.alert-badge-paused {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748B;
+}
+
+/* Toggle Switch */
+.alert-toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.25s;
+  border: none;
+  padding: 0;
+}
+
+.alert-toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px;
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.alert-toggle-on {
+  background: #10B981;
+}
+
+.alert-toggle-on::after {
+  left: 19px;
+}
+
+.alert-toggle-off {
+  background: #CBD5E1;
+}
+
+.alert-toggle-off::after {
+  left: 3px;
+}
+
+.alert-toggle:hover {
+  opacity: 0.85;
+}
+
+/* History Dot */
+.alert-hist-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+}
+
+/* Alert Form */
+.alert-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alert-form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.alert-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 110px;
+}
+
+.alert-form-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.alert-email-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ===== CLERK PREBUILT COMPONENTS ===== */
+.clerk-root-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.clerk-card-box {
+  width: 100%;
+  max-width: 440px;
+}
+
+.clerk-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.7), rgba(255,255,255,0.4)) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 24px 80px rgba(31, 38, 135, 0.12), inset 0 2px 4px rgba(255,255,255,1) !important;
+}

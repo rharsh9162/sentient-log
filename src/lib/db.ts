@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { alertCron } from '@/services/AlertCron';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sentient_log';
 
@@ -36,6 +37,10 @@ export async function connectDB(): Promise<typeof mongoose> {
         dbName: 'sentient_log', // explicitly specify DB name
       })
       .then((m) => {
+        // Just by accessing alertCron, we ensure the singleton starts its timer
+        if (alertCron) {
+          // initialized
+        }
         console.log('✅ MongoDB connected successfully');
         return m;
       })
