@@ -44,7 +44,7 @@ export default function AlertsPage() {
   const [formMetric, setFormMetric] = useState('avg_latency');
   const [formCondition, setFormCondition] = useState('gt');
   const [formThreshold, setFormThreshold] = useState(2000);
-  const [formFrequency, setFormFrequency] = useState('daily');
+  const [formFrequency, setFormFrequency] = useState<AlertRule['frequency']>('daily');
   const [formLoading, setFormLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -492,7 +492,7 @@ export default function AlertsPage() {
                 <select
                   className="filter-select"
                   value={formFrequency}
-                  onChange={(e) => setFormFrequency(e.target.value)}
+                  onChange={(e) => setFormFrequency(e.target.value as AlertRule['frequency'])}
                 >
                   {FREQUENCY_OPTIONS.map((c) => (
                     <option key={c.value} value={c.value}>{c.label}</option>

@@ -69,7 +69,6 @@ export function Navbar() {
         </button>
         <div className="navbar-user">
           <UserButton 
-            afterSignOutUrl="/login"
             appearance={{
               elements: {
                 userButtonAvatarBox: {
