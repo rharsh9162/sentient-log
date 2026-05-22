@@ -11,7 +11,7 @@ export async function computeMetric(
   frequency: string
 ): Promise<number> {
   const now = new Date();
-  
+
   let windowMs = 24 * 60 * 60 * 1000; // default daily
   if (frequency === '15m') windowMs = 15 * 60 * 1000;
   if (frequency === 'weekly') windowMs = 7 * 24 * 60 * 60 * 1000;
@@ -64,7 +64,7 @@ export function shouldFire(measured: number, condition: string, threshold: numbe
 
 export function isDueForCheck(lastCheckedAt: Date | null, frequency: string): boolean {
   if (!lastCheckedAt) return true;
-  
+
   let frequencyMs = 24 * 60 * 60 * 1000; // default daily
   if (frequency === '15m') frequencyMs = 15 * 60 * 1000;
   if (frequency === 'weekly') frequencyMs = 7 * 24 * 60 * 60 * 1000;
@@ -98,7 +98,7 @@ export async function runAlertChecks(userId?: string) {
     }
 
     const now = new Date();
-    
+
     // Update last_checked_at immediately
     await Alert.findByIdAndUpdate(alert._id, { $set: { last_checked_at: now } });
 
