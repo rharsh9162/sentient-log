@@ -11,7 +11,9 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="landing-nav">
         <div className="landing-nav-logo">
-          <div className="landing-logo-icon">S</div>
+          <div className="landing-logo-icon" style={{ background: 'transparent', boxShadow: 'none' }}>
+            <img src="/icon.png" alt="SentientLog Icon" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
           <span className="landing-logo-text">SentientLog</span>
         </div>
         <div className="landing-nav-links">
