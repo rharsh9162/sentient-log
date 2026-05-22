@@ -91,12 +91,19 @@ export async function sendAlertEmail(data) {
   });
 
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: "SentientLog Alerts <onboarding@resend.dev>",
       to: [to],
       subject: `Alert fired: ${ruleName}`,
       html,
     });
+    
+    if (error) {
+      console.error("Resend API error:", error);
+      return false;
+    }
+    
+    console.log(`Alert email successfully sent to ${to}`);
     return true;
   } catch (error) {
     console.error("Failed to send alert email:", error);
