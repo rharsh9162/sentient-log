@@ -138,18 +138,18 @@ export async function runAlertChecks(userId) {
 
     // Find user email
     let userEmail = null;
-    if (userId) {
-      // In a manual trigger for a specific user, we rely on the route to send email,
-      // but wait, let's just get it directly via Clerk client
+    let user = allUsers.find((u) => u.id === alert.user_id);
+    
+    if (!user) {
       try {
         const client = await clerkClient();
-        const user = await client.users.getUser(alert.user_id);
-        userEmail = user.emailAddresses[0]?.emailAddress;
-      } catch (e) {}
-    } else {
-      const user = allUsers.find((u) => u.id === alert.user_id);
-      userEmail = user?.emailAddresses?.[0]?.emailAddress;
+        user = await client.users.getUser(alert.user_id);
+      } catch (e) {
+        console.error("Could not fetch specific user for alert", alert.user_id, e);
+      }
     }
+    
+    userEmail = user?.emailAddresses?.[0]?.emailAddress;
 
     // Send email notification
     if (
