@@ -49,6 +49,10 @@
   function trackEvent(event) {
     eventBuffer.push({
       ...event,
+      metadata: {
+        ...event.metadata,
+        domain: window.location.hostname,
+      },
       session_id: SESSION_ID,
       timestamp: new Date().toISOString(),
     });
@@ -83,7 +87,7 @@
   function trackPageView() {
     trackEvent({
       event_type: "page_view",
-      url: window.location.pathname,
+      url: window.location.href,
       latency_ms: 0,
       metadata: { browser: getBrowserName(), device: getDeviceType() },
     });
@@ -126,7 +130,7 @@
 
     trackEvent({
       event_type: "click",
-      url: window.location.pathname,
+      url: window.location.href,
       latency_ms: 0,
       metadata: { tag, text: text || undefined, id: id || undefined, class: className || undefined, browser: getBrowserName(), device: getDeviceType() },
     });
@@ -172,7 +176,7 @@
   window.addEventListener("error", (event) => {
     trackEvent({
       event_type: "error",
-      url: window.location.pathname,
+      url: window.location.href,
       latency_ms: 0,
       status_code: 500,
       metadata: { message: event.message?.substring(0, 200), filename: event.filename?.split("/").pop(), browser: getBrowserName(), device: getDeviceType() },
@@ -183,7 +187,7 @@
     const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
     trackEvent({
       event_type: "error",
-      url: window.location.pathname,
+      url: window.location.href,
       latency_ms: 0,
       status_code: 500,
       metadata: { message: `Unhandled Promise: ${reason.substring(0, 200)}`, browser: getBrowserName(), device: getDeviceType() },
