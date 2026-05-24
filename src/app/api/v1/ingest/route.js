@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { batchIngester } from "@/services/BatchIngester";
+import { connectDB } from "@/lib/db";
+import { Event } from "@/models/Event";
 import { getUserId } from "@/lib/getUser";
 
 // Helper to set CORS headers
@@ -41,12 +42,16 @@ export async function POST(req) {
     const taggedEvents = events.map((e) => ({
       ...e,
       user_id: targetUserId || undefined,
+      timestamp: e.timestamp || new Date(),
     }));
 
-    batchIngester.add(taggedEvents);
+    // In a Vercel Serverless environment, background intervals (like BatchIngester) 
+    // will be frozen before they can flush. We must write directly to the DB.
+    await connectDB();
+    await Event.insertMany(taggedEvents, { ordered: false });
 
     const res = NextResponse.json(
-      { accepted: taggedEvents.length, buffered: batchIngester.bufferSize },
+      { accepted: taggedEvents.length },
       { status: 202 },
     );
     return setCorsHeaders(res);
