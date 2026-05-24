@@ -14,8 +14,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useAuth } from "@clerk/nextjs";
 
 export default function OverviewPage() {
+  const { userId } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [domain, setDomain] = useState("");
@@ -82,7 +84,14 @@ export default function OverviewPage() {
         }}
       >
         <div>
-          <h1 className="page-title">Overview</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1 className="page-title">Overview</h1>
+            {userId && (
+              <span className="badge badge-api_call" style={{ fontSize: '11px', padding: '2px 6px' }}>
+                Account ID: {userId}
+              </span>
+            )}
+          </div>
           <p className="page-subtitle">
             {domain
               ? `Showing data for ${domain}`

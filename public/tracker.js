@@ -1,229 +1,204 @@
 /**
- * SentientLog — Embeddable Tracking Snippet
- *
- * Add this script tag to ANY website to send real analytics data
- * back to your SentientLog dashboard:
- *
- *   <script src="http://localhost:3000/tracker.js" data-endpoint="http://localhost:3000/api/v1/ingest"></script>
- *
- * It will automatically capture:
- *   • Page views (+ load time)
- *   • Clicks on interactive elements
- *   • JavaScript errors
- *   • Fetch/XHR API call latencies
+ * SentientLog External Tracker
+ * Captures page views, clicks, API latencies, and errors.
+ * 
+ * Usage:
+ * <script src="https://sentient-log-rho.vercel.app/tracker.js" data-site-id="YOUR_USER_ID" defer></script>
  */
 
 (function () {
-  'use strict';
+  if (typeof window === "undefined") return;
 
-  var ENDPOINT = document.currentScript
-    ? document.currentScript.getAttribute('data-endpoint') || '/api/v1/ingest'
-    : '/api/v1/ingest';
+  const scriptTag = document.currentScript || document.querySelector('script[src*="tracker.js"]');
+  const siteId = scriptTag ? scriptTag.getAttribute("data-site-id") : null;
+  const isInternal = scriptTag ? scriptTag.hasAttribute("data-internal") : false;
+  const scriptOrigin = scriptTag ? new URL(scriptTag.src).origin : "https://sentient-log-rho.vercel.app";
+  const ingestUrl = `${scriptOrigin}/api/v1/ingest?siteId=${siteId || ""}`;
 
-  var SESSION_ID = 'sess_' + Math.random().toString(36).substring(2, 10);
-  var buffer = [];
-  var flushTimer = null;
-
-  // ---- Utilities ----
-  function getBrowser() {
-    var ua = navigator.userAgent;
-    if (ua.indexOf('Firefox') > -1) return 'Firefox';
-    if (ua.indexOf('Edg') > -1) return 'Edge';
-    if (ua.indexOf('Chrome') > -1) return 'Chrome';
-    if (ua.indexOf('Safari') > -1) return 'Safari';
-    return 'Other';
+  if (!siteId && !isInternal) {
+    console.warn("SentientLog: data-site-id attribute is missing on the script tag. Tracking is disabled.");
+    return;
   }
 
-  function getDevice() {
-    var w = window.innerWidth;
-    if (w < 768) return 'mobile';
-    if (w < 1024) return 'tablet';
-    return 'desktop';
-  }
+  const SESSION_ID = `sess_${Math.random().toString(36).substring(2, 10)}`;
+  const eventBuffer = [];
+  let flushTimer = null;
 
-  // ---- Event Buffer ----
-  function track(event) {
-    event.session_id = SESSION_ID;
-    event.timestamp = new Date().toISOString();
-    event.metadata = event.metadata || {};
-    event.metadata.browser = getBrowser();
-    event.metadata.device = getDevice();
-    event.metadata.source = window.location.hostname;
-    buffer.push(event);
+  function flushEvents() {
+    if (eventBuffer.length === 0) return;
+    const batch = eventBuffer.splice(0);
 
-    if (buffer.length >= 10) {
-      flush();
-    } else if (!flushTimer) {
-      flushTimer = setTimeout(function () {
-        flushTimer = null;
-        flush();
-      }, 3000);
-    }
-  }
-
-  function flush() {
-    if (buffer.length === 0) return;
-    var batch = buffer.splice(0);
-    var payload = JSON.stringify({ events: batch });
+    const payload = JSON.stringify({ events: batch });
 
     if (navigator.sendBeacon) {
-      navigator.sendBeacon(ENDPOINT, new Blob([payload], { type: 'application/json' }));
+      navigator.sendBeacon(ingestUrl, new Blob([payload], { type: "application/json" }));
     } else {
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', ENDPOINT, true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(payload);
+      fetch(ingestUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true
+      }).catch(() => {});
     }
   }
 
-  // ---- Page View ----
-  track({
-    event_type: 'page_view',
-    url: window.location.pathname,
-    latency_ms: Math.round(performance.now()),
-    status_code: 200,
-    metadata: {
-      referrer: document.referrer || 'direct',
-      title: document.title,
-      full_url: window.location.href,
-    },
-  });
-
-  // SPA: track popstate (back/forward) navigation
-  window.addEventListener('popstate', function () {
-    track({
-      event_type: 'page_view',
-      url: window.location.pathname,
-      latency_ms: 0,
-      status_code: 200,
-      metadata: { nav_type: 'popstate', title: document.title },
-    });
-  });
-
-  // ---- Click Tracking ----
-  var lastClick = 0;
-  document.addEventListener(
-    'click',
-    function (e) {
-      var now = Date.now();
-      if (now - lastClick < 300) return;
-      lastClick = now;
-
-      var el = e.target;
-      var interactiveTags = ['button', 'a', 'input', 'select', 'textarea'];
-
-      // Walk up to find the nearest interactive element
-      var interactive = el;
-      for (var i = 0; i < 5 && interactive; i++) {
-        if (interactiveTags.indexOf((interactive.tagName || '').toLowerCase()) > -1) break;
-        if (interactive.getAttribute && interactive.getAttribute('role') === 'button') break;
-        interactive = interactive.parentElement;
-      }
-
-      if (!interactive || interactiveTags.indexOf((interactive.tagName || '').toLowerCase()) === -1) {
-        return;
-      }
-
-      track({
-        event_type: 'click',
-        url: window.location.pathname,
-        latency_ms: 0,
-        metadata: {
-          tag: (interactive.tagName || '').toLowerCase(),
-          text: (interactive.textContent || '').trim().substring(0, 50),
-          id: interactive.id || undefined,
-          href: interactive.href || undefined,
-        },
-      });
-    },
-    true
-  );
-
-  // ---- Error Tracking ----
-  window.addEventListener('error', function (e) {
-    track({
-      event_type: 'error',
-      url: window.location.pathname,
-      latency_ms: 0,
-      status_code: 500,
-      metadata: {
-        message: (e.message || '').substring(0, 200),
-        filename: (e.filename || '').split('/').pop(),
-        line: e.lineno,
-      },
-    });
-  });
-
-  window.addEventListener('unhandledrejection', function (e) {
-    var reason = e.reason instanceof Error ? e.reason.message : String(e.reason);
-    track({
-      event_type: 'error',
-      url: window.location.pathname,
-      latency_ms: 0,
-      status_code: 500,
-      metadata: { message: 'Unhandled: ' + reason.substring(0, 200) },
-    });
-  });
-
-  // ---- API Call Tracking (fetch) ----
-  if (window.fetch) {
-    var origFetch = window.fetch;
-    window.fetch = function () {
-      var url =
-        typeof arguments[0] === 'string'
-          ? arguments[0]
-          : arguments[0] instanceof URL
-          ? arguments[0].toString()
-          : arguments[0].url || '';
-
-      // Skip tracking our own ingest calls
-      if (url.indexOf('/api/v1/ingest') > -1) {
-        return origFetch.apply(this, arguments);
-      }
-
-      var start = performance.now();
-      var args = arguments;
-      return origFetch.apply(this, args).then(
-        function (response) {
-          var latency = Math.round(performance.now() - start);
-          try {
-            var parsed = new URL(url, window.location.origin);
-            track({
-              event_type: 'api_call',
-              url: parsed.pathname,
-              latency_ms: latency,
-              status_code: response.status,
-              metadata: {
-                method: ((args[1] && args[1].method) || 'GET').toUpperCase(),
-              },
-            });
-          } catch (_e) {
-            // ignore URL parse errors
-          }
-          return response;
-        },
-        function (err) {
-          var latency = Math.round(performance.now() - start);
-          track({
-            event_type: 'error',
-            url: url,
-            latency_ms: latency,
-            status_code: 0,
-            metadata: {
-              message: 'Fetch failed: ' + (err.message || 'unknown'),
-            },
-          });
-          throw err;
-        }
-      );
-    };
+  function scheduleFlush() {
+    if (flushTimer) return;
+    flushTimer = setTimeout(() => {
+      flushTimer = null;
+      flushEvents();
+    }, 2000);
   }
 
-  // ---- Flush on exit ----
-  window.addEventListener('beforeunload', flush);
-  window.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden') flush();
+  function trackEvent(event) {
+    eventBuffer.push({
+      ...event,
+      session_id: SESSION_ID,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (eventBuffer.length >= 20) {
+      flushEvents();
+    } else {
+      scheduleFlush();
+    }
+  }
+
+  // Utilities
+  function getBrowserName() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Edg")) return "Edge";
+    if (ua.includes("Chrome")) return "Chrome";
+    if (ua.includes("Safari")) return "Safari";
+    return "Other";
+  }
+
+  function getDeviceType() {
+    const w = window.innerWidth;
+    if (w < 768) return "mobile";
+    if (w < 1024) return "tablet";
+    return "desktop";
+  }
+
+  // 1. Track Page Views (SPA & Normal)
+  let lastPath = window.location.pathname;
+  
+  function trackPageView() {
+    trackEvent({
+      event_type: "page_view",
+      url: window.location.pathname,
+      latency_ms: 0,
+      metadata: { browser: getBrowserName(), device: getDeviceType() },
+    });
+  }
+
+  // Initial page view
+  trackPageView();
+
+  // Watch for SPA history changes
+  const originalPushState = history.pushState;
+  history.pushState = function () {
+    originalPushState.apply(this, arguments);
+    if (window.location.pathname !== lastPath) {
+      lastPath = window.location.pathname;
+      trackPageView();
+    }
+  };
+  window.addEventListener("popstate", () => {
+    if (window.location.pathname !== lastPath) {
+      lastPath = window.location.pathname;
+      trackPageView();
+    }
   });
 
-  console.log('[SentientLog] Tracker active — session:', SESSION_ID);
+  // 2. Track Clicks
+  let lastClickTime = 0;
+  document.addEventListener("click", (e) => {
+    const now = Date.now();
+    if (now - lastClickTime < 300) return;
+    lastClickTime = now;
+
+    const target = e.target;
+    const tag = target.tagName?.toLowerCase() || "unknown";
+    const text = (target.textContent || "").trim().substring(0, 50);
+    const id = target.id || "";
+    const className = target.className && typeof target.className === "string" ? target.className.split(" ").slice(0, 2).join(" ") : "";
+
+    const isInteractive = ["button", "a", "input", "select", "textarea", "label"].includes(tag) || target.closest('button, a, [role="button"]');
+    if (!isInteractive) return;
+
+    trackEvent({
+      event_type: "click",
+      url: window.location.pathname,
+      latency_ms: 0,
+      metadata: { tag, text: text || undefined, id: id || undefined, class: className || undefined, browser: getBrowserName(), device: getDeviceType() },
+    });
+  }, true);
+
+  // 3. Track API Latency
+  const originalFetch = window.fetch;
+  window.fetch = async function (...args) {
+    const urlStr = typeof args[0] === "string" ? args[0] : args[0] instanceof URL ? args[0].toString() : args[0].url;
+    
+    // Don't track our own ingest
+    if (urlStr.includes("/api/v1/ingest")) {
+      return originalFetch.apply(this, args);
+    }
+
+    const start = performance.now();
+    try {
+      const response = await originalFetch.apply(this, args);
+      const latency = Math.round(performance.now() - start);
+
+      trackEvent({
+        event_type: "api_call",
+        url: urlStr.length > 100 ? urlStr.substring(0, 100) + '...' : urlStr,
+        latency_ms: latency,
+        status_code: response.status,
+        metadata: { method: (args[1]?.method || "GET").toUpperCase(), browser: getBrowserName(), device: getDeviceType() },
+      });
+      return response;
+    } catch (err) {
+      const latency = Math.round(performance.now() - start);
+      trackEvent({
+        event_type: "error",
+        url: urlStr.length > 100 ? urlStr.substring(0, 100) + '...' : urlStr,
+        latency_ms: latency,
+        status_code: 0,
+        metadata: { message: `Fetch failed: ${err.message || "unknown"}`, method: (args[1]?.method || "GET").toUpperCase(), browser: getBrowserName(), device: getDeviceType() },
+      });
+      throw err;
+    }
+  };
+
+  // 4. Track JS Errors
+  window.addEventListener("error", (event) => {
+    trackEvent({
+      event_type: "error",
+      url: window.location.pathname,
+      latency_ms: 0,
+      status_code: 500,
+      metadata: { message: event.message?.substring(0, 200), filename: event.filename?.split("/").pop(), browser: getBrowserName(), device: getDeviceType() },
+    });
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    const reason = event.reason instanceof Error ? event.reason.message : String(event.reason);
+    trackEvent({
+      event_type: "error",
+      url: window.location.pathname,
+      latency_ms: 0,
+      status_code: 500,
+      metadata: { message: `Unhandled Promise: ${reason.substring(0, 200)}`, browser: getBrowserName(), device: getDeviceType() },
+    });
+  });
+
+  // Flush on unload
+  window.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      flushEvents();
+    }
+  });
+
 })();

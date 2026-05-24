@@ -1,11 +1,11 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
-import { SelfTracker } from "@/components/SelfTracker";
+import Script from "next/script";
 
 export default function DashboardLayout({ children }) {
   return (
     <div className="dashboard-layout">
-      <SelfTracker />
+      <Script src="/tracker.js" data-internal="true" strategy="afterInteractive" />
       <Sidebar />
       <div className="dashboard-main">
         <Navbar />

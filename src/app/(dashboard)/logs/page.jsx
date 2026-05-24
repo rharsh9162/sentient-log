@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Fragment } from "react";
 import { getLogs, getStats } from "@/lib/api";
 import {
   Search,
@@ -211,9 +211,8 @@ export default function LogsPage() {
               </thead>
               <tbody>
                 {events.map((event) => (
-                  <>
+                  <React.Fragment key={event._id}>
                     <tr
-                      key={event._id}
                       onClick={() =>
                         setExpandedId(
                           expandedId === event._id ? null : event._id,
@@ -304,7 +303,7 @@ export default function LogsPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

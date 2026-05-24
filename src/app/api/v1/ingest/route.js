@@ -2,36 +2,60 @@ import { NextResponse } from "next/server";
 import { batchIngester } from "@/services/BatchIngester";
 import { getUserId } from "@/lib/getUser";
 
+// Helper to set CORS headers
+function setCorsHeaders(res) {
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  return res;
+}
+
+export async function OPTIONS() {
+  const res = new NextResponse(null, { status: 200 });
+  return setCorsHeaders(res);
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
     const { events } = body;
 
     if (!Array.isArray(events) || events.length === 0) {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { error: "events array is required and must not be empty" },
         { status: 400 },
       );
+      return setCorsHeaders(res);
+    }
+
+    // Determine target user ID (from query param for external tracking, or active session for internal)
+    const url = new URL(req.url);
+    const siteId = url.searchParams.get("siteId");
+    let targetUserId = siteId;
+
+    if (!targetUserId) {
+      targetUserId = await getUserId(); // Fallback to current authenticated user
     }
 
     // Tag events with user_id for data isolation
-    const userId = await getUserId();
     const taggedEvents = events.map((e) => ({
       ...e,
-      user_id: userId || undefined,
+      user_id: targetUserId || undefined,
     }));
 
     batchIngester.add(taggedEvents);
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       { accepted: taggedEvents.length, buffered: batchIngester.bufferSize },
       { status: 202 },
     );
+    return setCorsHeaders(res);
   } catch (error) {
     console.error("Ingest error:", error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { error: "Invalid request body" },
       { status: 400 },
     );
+    return setCorsHeaders(res);
   }
 }
