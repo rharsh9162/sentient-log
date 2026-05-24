@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Activity, Timer, AlertCircle, Globe, Filter } from "lucide-react";
+import { Activity, Timer, AlertCircle, Globe, Filter, Copy, Check } from "lucide-react";
 import { getStats } from "@/lib/api";
 import {
   LineChart,
@@ -18,9 +18,18 @@ import { useAuth } from "@clerk/nextjs";
 
 export default function OverviewPage() {
   const { userId } = useAuth();
+  const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [domain, setDomain] = useState("");
+
+  const handleCopyId = () => {
+    if (userId) {
+      navigator.clipboard.writeText(userId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const fetchStats = useCallback(async () => {
     try {
@@ -87,9 +96,31 @@ export default function OverviewPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <h1 className="page-title">Overview</h1>
             {userId && (
-              <span className="badge badge-api_call" style={{ fontSize: '11px', padding: '2px 6px' }}>
-                Account ID: {userId}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className="badge badge-api_call" style={{ fontSize: '11px', padding: '3px 8px' }}>
+                  Account ID: <span style={{ fontFamily: 'monospace', marginLeft: '4px' }}>{userId}</span>
+                </span>
+                <button
+                  onClick={handleCopyId}
+                  title="Copy Account ID"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #E2E8F0',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#334155'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B'; }}
+                >
+                  {copied ? <Check size={14} color="#10B981" /> : <Copy size={14} />}
+                </button>
+              </div>
             )}
           </div>
           <p className="page-subtitle">
