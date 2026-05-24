@@ -30,16 +30,12 @@
 
     const payload = JSON.stringify({ events: batch });
 
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(ingestUrl, new Blob([payload], { type: "application/json" }));
-    } else {
-      fetch(ingestUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-        keepalive: true
-      }).catch(() => {});
-    }
+    fetch(ingestUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true
+    }).catch(() => {});
   }
 
   function scheduleFlush() {
