@@ -14,7 +14,7 @@ import {
   Legend,
 } from "recharts";
 
-const PIE_COLORS = ["#6366F1", "#22C55E", "#EF4444", "#F59E0B", "#8B5CF6", "#06B6D4"];
+const PIE_COLORS = ["#2563EB", "#22C55E", "#EF4444", "#F59E0B", "#3B82F6", "#06B6D4"];
 
 export default function OverviewTab({ stats, tooltipStyle }) {
   if (!stats) return null;
@@ -81,7 +81,7 @@ export default function OverviewTab({ stats, tooltipStyle }) {
               <Tooltip {...tooltipStyle} />
               <Bar
                 dataKey="count"
-                fill="#6366F1"
+                fill="#2563EB"
                 radius={[4, 4, 0, 0]}
                 barSize={24}
               />
@@ -114,10 +114,10 @@ export default function OverviewTab({ stats, tooltipStyle }) {
             <Line
               type="monotone"
               dataKey="count"
-              stroke="#6366F1"
+              stroke="#2563EB"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: "#6366F1" }}
+              activeDot={{ r: 4, fill: "#2563EB" }}
             />
           </LineChart>
         </ResponsiveContainer>

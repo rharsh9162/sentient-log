@@ -21,19 +21,19 @@ export async function connectDB() {
   }
 
   if (!cached.promise) {
-    console.log("🔌 Connecting to MongoDB...");
+    console.log("[DB] Connecting to MongoDB...");
     cached.promise = mongoose
       .connect(MONGODB_URI, {
         dbName: "sentient_log", // explicitly specify DB name
       })
       .then((m) => {
-        console.log("✅ MongoDB connected successfully");
+        console.log("[DB] MongoDB connected successfully");
         return m;
       })
       .catch((err) => {
         // CRITICAL: Reset the cached promise on failure
         // so the next request can retry instead of reusing the rejected promise
-        console.error("❌ MongoDB connection failed:", err.message);
+        console.error("[DB] MongoDB connection failed:", err.message);
         cached.promise = null;
         cached.conn = null;
         throw err;

@@ -218,10 +218,10 @@ export default function OverviewPage() {
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="#6366F1"
+                stroke="#2563EB"
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4, fill: "#6366F1" }}
+                activeDot={{ r: 4, fill: "#2563EB" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -293,7 +293,7 @@ export default function OverviewPage() {
 
                 <Bar
                   dataKey="count"
-                  fill="#6366F1"
+                  fill="#2563EB"
                   radius={[0, 4, 4, 0]}
                   barSize={18}
                 />
@@ -336,7 +336,7 @@ export default function OverviewPage() {
                 );
                 const pct = (count / max) * 100;
                 const colors = {
-                  page_view: "#6366F1",
+                  page_view: "#2563EB",
                   click: "#22C55E",
                   error: "#EF4444",
                   api_call: "#F59E0B",

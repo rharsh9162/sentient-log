@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentientLog - Ask AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f9f9f9",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "muted-ash": "#333333",
+                        "outline": "#767587",
+                        "on-tertiary-container": "#ffefe9",
+                        "tertiary-container": "#b94d00",
+                        "primary-fixed": "#e1dfff",
+                        "secondary-fixed": "#e5e2e1",
+                        "outline-variant": "#c6c4d8",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-high": "#e8e8e8",
+                        "secondary": "#5f5e5e",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2f3131",
+                        "surface": "#f9f9f9",
+                        "on-background": "#1a1c1c",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "inverse-primary": "#c1c1ff",
+                        "on-secondary-container": "#636262",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-fixed": "#341000",
+                        "tertiary": "#923b00",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-container": "#5757f8",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "secondary-container": "#e2dfde",
+                        "on-tertiary-fixed-variant": "#7a3000",
+                        "on-primary-container": "#f3f0ff",
+                        "surface-dim": "#dadada",
+                        "ghost-border": "#f7f5fd",
+                        "surface-variant": "#e2e2e2",
+                        "primary-fixed-dim": "#c1c1ff",
+                        "surface-container": "#eeeeee",
+                        "on-surface": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#4644e7",
+                        "glass-overlay": "rgba(255, 255, 255, 0.4)",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary": "#3c39df",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#2a22d1",
+                        "paper-white": "#ffffff",
+                        "on-primary-fixed": "#08006c",
+                        "electric-violet": "#5757f8"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "body": ["Inter"],
+                        "caption": ["Inter"],
+                        "subheading": ["Inter"],
+                        "heading-sm": ["Inter"],
+                        "heading-lg": ["Montserrat"],
+                        "heading": ["Montserrat"],
+                        "display": ["Montserrat"]
+                    },
+                    fontSize: {
+                        "body": ["16px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "caption": ["14px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "subheading": ["18px", {"lineHeight": "1.43", "fontWeight": "500"}],
+                        "heading-sm": ["20px", {"lineHeight": "1.43", "fontWeight": "700"}],
+                        "heading-lg": ["36px", {"lineHeight": "1", "letterSpacing": "-0.72px", "fontWeight": "500"}],
+                        "heading": ["26px", {"lineHeight": "1.2", "letterSpacing": "-0.52px", "fontWeight": "500"}],
+                        "display": ["48px", {"lineHeight": "0.97", "letterSpacing": "-0.96px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; } h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; } .glassmorphic-sidebar { background: linear-gradient(180deg, rgba(103, 58, 183, 0.3) 0%, rgba(63, 81, 181, 0.2) 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-right: 1px solid rgba(255, 255, 255, 0.1); color: white; } .sidebar-active-item { background: rgba(255, 255, 255, 0.2) !important; border-radius: 0.5rem; } .main-bg { background-color: #f5f5f5; } .paper-white-card { background-color: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); } .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; } .bg-mesh { background-color: #5757f8; background-image: radial-gradient(at 0% 0%, #6d28d9 0, transparent 50%), radial-gradient(at 50% 0%, #4f46e5 0, transparent 50%), radial-gradient(at 100% 0%, #7c3aed 0, transparent 50%); } .glass-card { background: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05); }</style>
+<style>body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; } h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; } .glassmorphic-sidebar { background: linear-gradient(180deg, rgba(103, 58, 183, 0.3) 0%, rgba(63, 81, 181, 0.2) 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-right: 1px solid rgba(255, 255, 255, 0.1); color: white; } .sidebar-active-item { background: rgba(255, 255, 255, 0.2) !important; border-radius: 0.5rem; } .main-bg { background-color: #f5f5f5; } .paper-white-card { background-color: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); } .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; } .bg-mesh { background-color: #5757f8; background-image: radial-gradient(at 0% 0%, #6d28d9 0, transparent 50%), radial-gradient(at 50% 0%, #4f46e5 0, transparent 50%), radial-gradient(at 100% 0%, #7c3aed 0, transparent 50%); } .glass-card { background: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05); }</style><style>body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; } h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; } .glassmorphic-sidebar { background: linear-gradient(180deg, rgba(103, 58, 183, 0.3) 0%, rgba(63, 81, 181, 0.2) 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-right: 1px solid rgba(255, 255, 255, 0.1); color: white; } .sidebar-active-item { background: rgba(255, 255, 255, 0.2) !important; border-radius: 0.5rem; } .main-bg { background-color: #f5f5f5; } .paper-white-card { background-color: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); } .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; } .bg-mesh { background-color: #5757f8; background-image: radial-gradient(at 0% 0%, #6d28d9 0, transparent 50%), radial-gradient(at 50% 0%, #4f46e5 0, transparent 50%), radial-gradient(at 100% 0%, #7c3aed 0, transparent 50%); } .glass-card { background: #ffffff; border: 1px solid #eeeeee; box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05); }</style></head>
+<body class="bg-background font-body text-on-surface min-h-screen flex bg-mesh">
+<!-- SideNavBar based on Image 20 with Glassmorphism -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col glassmorphic-sidebar z-50"><div class="p-6 flex items-center justify-between"><div class="flex items-center gap-3"><img alt="SentientLog Logo" class="w-8 h-8 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLYUG9oklBQ5LU7mFXnwFHmbeLGA7dVhOn2v02gXe7m5IdmCcxOwPpJVAL_IXMVOL7FLodyRkOs8_rEuyQ3SiUKaxcAVr1xL40R7XzVVQ4k2CuiOMx4yZ7HjLaZcTDyQmzx5ESfYfISzfLxalhyEHhI6yQ-2mQR-WtQAvxWFPkGxV_x5gfUbPOHP1WZ1MhNN14OMOrI008TGjdlJZ4lNG-PC2XI6rtEOVT0HJflvNStRBrU2pBhxM43UR1PZuQ3v1C4DDcM0dGd1zp"/><h1 class="text-xl font-semibold tracking-tight text-white">Taskapp</h1></div><button class="text-white/60 hover:text-white"><span class="material-symbols-outlined text-xl">side_navigation</span></button></div><div class="px-4 mt-2 overflow-y-auto flex-1"><p class="px-2 text-[11px] font-medium text-white/50 uppercase tracking-widest mb-4">Menu</p><nav class="space-y-1.5"><a class="flex items-center gap-3 px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all" href="#"><span class="material-symbols-outlined text-xl">home</span><span class="text-sm font-medium">Dashboard</span></a><a class="flex items-center justify-between px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">check_box</span><span class="text-sm font-medium">My Tasks</span></div><span class="text-[10px] font-medium text-white/50">8</span></a><a class="flex items-center justify-between px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">chat</span><span class="text-sm font-medium">Messages</span></div><span class="text-[10px] font-medium text-white/50">4</span></a><a class="flex items-center gap-3 px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all" href="#"><span class="material-symbols-outlined text-xl">settings</span><span class="text-sm font-medium">Settings</span></a></nav><p class="px-2 text-[11px] font-medium text-white/50 uppercase tracking-widest mt-8 mb-4">Projects</p><nav class="space-y-1.5"><a class="flex items-center justify-between px-3 py-2 text-white/90 hover:bg-white/10 rounded-lg transition-all" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">folder</span><span class="text-sm font-medium">Landing Page</span></div><span class="text-[10px] font-medium text-white/50">12</span></a><a class="flex items-center justify-between px-3 py-2 text-white sidebar-active-item transition-all" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">smart_toy</span><span class="text-sm font-medium">Ask AI</span></div><span class="text-[10px] font-medium text-white/80">AI</span></a></nav></div><div class="p-6 mt-auto"><div class="flex items-center gap-3 py-3 px-2 border-t border-white/10"><img alt="User profile" class="w-9 h-9 rounded-full object-cover border border-white/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKSOGry6nvEXDQFeil86fSH_LmwieE9wvTF0LWPMt8QP5xZpD4vews_whWYmhY04NeO_WThTyt972eysjx_S-SXL5OtkGbU82ADxSRU8vxTGm70CyU8kHcIoW0d-GnMVgHdnEptwlswN676gZ3jwC2JSY96B_F-NEkNnOBRrRFndLGeFH7tVYiRl8T2Y_AmmbR4tUacl5h5LvOQMmWmm2MFJHyKfCUlzwLE6LqEcjLfDT7SL4vwrDUJQRN4D2r_2lzzrej3sdiuoC6"/><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-white truncate">Alex Rivera</p><p class="text-[11px] text-white/50 truncate">alex@sentientlog.io</p></div><span class="material-symbols-outlined text-white/60 text-lg">expand_more</span></div></div></aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen rounded-l-[32px] overflow-hidden main-bg">
+<!-- Top Bar -->
+<header class="h-16 px-8 flex items-center justify-between border-b border-outline-variant bg-surface/50 backdrop-blur-md sticky top-0 z-40">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-caption font-semibold text-on-surface-variant">Systems Operational</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<button class="px-4 py-2 border border-error text-error text-caption font-bold rounded-lg hover:bg-error/5 transition-all">
+                Clear Session
+            </button>
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSL-BrQTdSvMGp5gdYy5adM1ptfUVBssRzX_sTVBPFe0qemxWu-pEoz53Qrd3hphLqw1nZfVoUTvkCATCEIEzL5BsNV3hcKl5PwiQ6GFBmuU9L5e5qzTKHEqla0tAiERVX3nL7zGqVgV2iRPKVhf-vtIYdcxzHOQJ6sGq4S9nsmp1rn5ezwHG7V-cYOJw1-Ionp3_mVftY9LwI8Nszzic-igVhvllWnQfuv-KpSuvV3KNiHEUdqbz6UG70Nqm6AnbEWUoPPFmd94su"/>
+</div>
+</header>
+<div class="p-10 mx-auto w-full">
+<!-- Page Header -->
+<div class="mb-10">
+<h2 class="font-display text-display font-bold text-on-surface">Ask AI</h2>
+<p class="font-body text-subheading text-on-surface-variant mt-2 max-w-2xl">
+                Advanced natural language log querying. Powered by Gemini Pro with Electric Violet telemetry engine.
+            </p>
+</div>
+<!-- AI Chat Interface with Violet Glows -->
+<section class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden violet-glow violet-inner-glow mb-10"><div class="flex flex-col lg:flex-row min-h-[400px]"><div class="flex-1 p-12 text-center relative flex flex-col justify-center items-center"><div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(87,87,248,0.05)_0%,transparent_70%)]"></div><div class="relative z-10 w-full flex flex-col items-center"><div class="w-16 h-16 bg-primary-container/10 rounded-2xl flex items-center justify-center mb-6 border border-primary-container/20"><span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span></div><h3 class="font-heading text-heading font-bold text-on-surface mb-2">Deep Log Analysis</h3><p class="font-caption text-outline mb-12">Connected to <span class="text-primary font-bold">MongoDB Production</span> • <span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-extrabold uppercase">Enterprise Ready</span></p><div class="w-full max-w-3xl"><div class="relative group"><div class="absolute -inset-1 bg-gradient-to-r from-primary to-electric-violet rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000"></div><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-6 text-outline group-focus-within:text-primary transition-colors">terminal</span><input class="w-full h-16 pl-16 pr-20 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body text-body text-on-surface focus:outline-none focus:border-primary transition-all shadow-xl" placeholder="Explain the spike in 404 errors on the checkout page..." type="text"/><button class="absolute right-3 p-3 bg-primary text-on-primary rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-95"><span class="material-symbols-outlined">send</span></button></div></div></div></div></div><div class="w-full lg:w-80 bg-surface-container-low border-l border-outline-variant/20 p-8 flex flex-col gap-4"><h5 class="font-heading text-[12px] font-bold text-outline uppercase tracking-widest mb-2">Quick Actions</h5><button class="flex items-center gap-3 p-3 bg-surface-container-lowest hover:bg-white border border-outline-variant/10 rounded-xl text-left transition-all group"><span class="material-symbols-outlined text-outline group-hover:text-primary text-[20px]">query_stats</span><div><p class="text-[13px] font-bold text-on-surface">Traffic Pulse</p><p class="text-[11px] text-outline">Top 10 hits</p></div></button><button class="flex items-center gap-3 p-3 bg-surface-container-lowest hover:bg-white border border-outline-variant/10 rounded-xl text-left transition-all group"><span class="material-symbols-outlined text-outline group-hover:text-primary text-[20px]">speed</span><div><p class="text-[13px] font-bold text-on-surface">Latency Heat</p><p class="text-[11px] text-outline">95th percentile</p></div></button><button class="flex items-center gap-3 p-3 bg-surface-container-lowest hover:bg-white border border-outline-variant/10 rounded-xl text-left transition-all group"><span class="material-symbols-outlined text-outline group-hover:text-primary text-[20px]">security_update_warning</span><div><p class="text-[13px] font-bold text-on-surface">Error Scan</p><p class="text-[11px] text-outline">Filter 5xx logs</p></div></button><div class="mt-auto pt-6 border-t border-outline-variant/20"><p class="text-[11px] text-outline leading-tight italic">Tip: Use natural language like "Show me errors from the last hour"</p></div></div></div></section>
+<!-- Lower Section Bento -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Recent Activity -->
+<div class="lg:col-span-7">
+<div class="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/20">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-heading text-heading-sm text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">manage_search</span>
+                            Historical Queries
+                        </h4>
+<button class="font-caption text-primary font-bold hover:underline">Clear History</button>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/10 flex items-center justify-between hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-outline group-hover:text-primary">
+<span class="material-symbols-outlined text-[20px]">history</span>
+</div>
+<p class="font-body text-caption font-medium">Analyze database locking during backup</p>
+</div>
+<span class="font-caption text-outline text-[12px]">2h ago</span>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/10 flex items-center justify-between hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-outline group-hover:text-primary">
+<span class="material-symbols-outlined text-[20px]">history</span>
+</div>
+<p class="font-body text-caption font-medium">Show user session duration by region</p>
+</div>
+<span class="font-caption text-outline text-[12px]">Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Visualization Callout -->
+<div class="lg:col-span-5">
+<div class="bg-electric-violet rounded-2xl p-8 text-white relative overflow-hidden h-full flex flex-col shadow-2xl shadow-primary/20">
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -left-10 -top-10 w-48 h-48 bg-tertiary/20 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<h4 class="font-heading text-heading-sm font-bold mb-4">Instant Visuals</h4>
+<p class="font-body text-caption text-white/80 mb-8 leading-relaxed">
+                            Turn complex log data into presentation-ready charts with one click.
+                        </p>
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 mb-8">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-[18px]">auto_graph</span>
+<span class="text-[12px] font-bold uppercase tracking-wider">Preview Generated</span>
+</div>
+<div class="flex items-end gap-1 h-20">
+<div class="w-full bg-white/20 h-[30%] rounded-t-sm"></div>
+<div class="w-full bg-white/40 h-[60%] rounded-t-sm"></div>
+<div class="w-full bg-white/60 h-[45%] rounded-t-sm"></div>
+<div class="w-full bg-white/80 h-[90%] rounded-t-sm"></div>
+<div class="w-full bg-white/50 h-[70%] rounded-t-sm"></div>
+</div>
+</div>
+<button class="w-full py-3 bg-white text-primary font-bold rounded-xl hover:bg-surface transition-all active:scale-95 shadow-xl">
+                            Generate New Dashboard
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-20 pt-8 border-t border-outline-variant flex justify-between items-center text-caption text-outline">
+<div class="flex gap-8">
+<a class="hover:text-primary" href="#">Documentation</a>
+<a class="hover:text-primary" href="#">API Console</a>
+<a class="hover:text-primary" href="#">Security Hub</a>
+</div>
+<p class="">© 2024 SentientLog. Revenue-Grade Automation Suite.</p>
+</footer>
+</div>
+</main>
+<!-- Chat Support Button -->
+<div class="fixed bottom-10 right-10 z-50">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-90 transition-all border border-white/20">
+<span class="material-symbols-outlined text-[28px]">support_agent</span>
+</button>
+</div>
+</body></html>

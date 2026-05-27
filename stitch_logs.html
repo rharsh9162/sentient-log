@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentientLog - Log Explorer</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary-fixed": "#ffdbcb",
+                "on-tertiary": "#ffffff",
+                "background": "#f9f9f9",
+                "tertiary-fixed-dim": "#ffb692",
+                "muted-ash": "#333333",
+                "outline": "#767587",
+                "on-tertiary-container": "#ffefe9",
+                "tertiary-container": "#b94d00",
+                "primary-fixed": "#e1dfff",
+                "secondary-fixed": "#e5e2e1",
+                "outline-variant": "#c6c4d8",
+                "surface-container-low": "#f3f3f3",
+                "surface-container-high": "#e8e8e8",
+                "secondary": "#5f5e5e",
+                "on-error-container": "#93000a",
+                "inverse-surface": "#2f3131",
+                "surface": "#f9f9f9",
+                "on-background": "#1a1c1c",
+                "on-error": "#ffffff",
+                "surface-container-highest": "#e2e2e2",
+                "inverse-primary": "#c1c1ff",
+                "on-secondary-container": "#636262",
+                "inverse-on-surface": "#f1f1f1",
+                "surface-bright": "#f9f9f9",
+                "on-secondary": "#ffffff",
+                "on-surface-variant": "#464555",
+                "on-tertiary-fixed": "#341000",
+                "tertiary": "#923b00",
+                "on-secondary-fixed-variant": "#474746",
+                "primary-container": "#5757f8",
+                "secondary-container": "#e2dfde",
+                "on-tertiary-fixed-variant": "#7a3000",
+                "on-primary-container": "#f3f0ff",
+                "surface-dim": "#dadada",
+                "ghost-border": "#f7f5fd",
+                "surface-variant": "#e2e2e2",
+                "primary-fixed-dim": "#c1c1ff",
+                "surface-container": "#eeeeee",
+                "on-surface": "#1a1c1c",
+                "error-container": "#ffdad6",
+                "surface-tint": "#4644e7",
+                "glass-overlay": "rgba(255, 255, 255, 0.4)",
+                "surface-container-lowest": "#ffffff",
+                "on-primary": "#ffffff",
+                "primary": "#5757f8",
+                "on-secondary-fixed": "#1b1c1c",
+                "error": "#ba1a1a",
+                "on-primary-fixed-variant": "#2a22d1",
+                "paper-white": "#ffffff",
+                "on-primary-fixed": "#08006c"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "body": ["Inter"],
+                "display": ["Montserrat"],
+                "heading": ["Montserrat"],
+                "nb-pro": ["Inter", "sans-serif"] /* Fallback for NB International Pro */
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #f9f9f9;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .sidebar-glass {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(32px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nav-item-active {
+            background: rgba(87, 87, 248, 0.15);
+            color: #5757f8;
+        }
+        .nav-item-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 3px;
+            background: #5757f8;
+            border-radius: 0 4px 4px 0;
+        }
+        .table-row-hover:hover {
+            background: #fdfdfd;
+            cursor: pointer;
+        }
+        .arctic-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .arctic-scroll::-webkit-scrollbar-thumb {
+            background: #e2e2e2;
+            border-radius: 10px;
+        }
+        /* Design System Specific */
+        .nb-heading {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+    </style>
+</head>
+<body class="text-on-surface bg-background antialiased flex">
+<!-- Glassmorphic Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col glassmorphic-sidebar z-50" id="SideNavBar" style="background: linear-gradient(rgba(103, 58, 183, 0.3) 0%, rgba(63, 81, 181, 0.2) 100%); backdrop-filter: blur(25px); border-right: 1px solid rgba(255, 255, 255, 0.1); color: white;">
+<div class="p-6 flex items-center gap-3"><div class="flex items-center gap-3">
+<img alt="SentientLog Logo" class="w-8 h-8 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLYUG9oklBQ5LU7mFXnwFHmbeLGA7dVhOn2v02gXe7m5IdmCcxOwPpJVAL_IXMVOL7FLodyRkOs8_rEuyQ3SiUKaxcAVr1xL40R7XzVVQ4k2CuiOMx4yZ7HjLaZcTDyQmzx5ESfYfISzfLxalhyEHhI6yQ-2mQR-WtQAvxWFPkGxV_x5gfUbPOHP1WZ1MhNN14OMOrI008TGjdlJZ4lNG-PC2XI6rtEOVT0HJflvNStRBrU2pBhxM43UR1PZuQ3v1C4DDcM0dGd1zp"/>
+<h1 class="text-xl font-semibold tracking-tight text-white">Taskapp</h1>
+</div>
+<button class="text-white/60 hover:text-white">
+<span class="material-symbols-outlined text-xl">side_navigation</span>
+</button></div>
+<div class="mt-4 space-y-1 px-4">
+<p class="px-2 text-[11px] font-medium text-white/50 uppercase tracking-widest mb-4">Menu</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all rounded-xl group" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all rounded-xl group" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="text-sm font-medium">Analyze Site</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-white sidebar-active-item transition-all" href="#" style="background: #5757f8 !important; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(87, 87, 248, 0.3);">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">segment</span>
+<span class="text-sm font-semibold">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all rounded-xl group" href="#">
+<span class="material-symbols-outlined text-[20px]">bar_chart</span>
+<span class="text-sm font-medium">Charts</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all rounded-xl group" href="#">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="text-sm font-medium">Alerts</span>
+</a>
+</nav>
+</div><div class="px-3 mt-8">
+<p class="px-2 text-[11px] font-medium text-white/50 uppercase tracking-widest mb-4">Menu</p>
+<a class="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all rounded-xl group" href="#">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+<span class="text-sm font-medium">Ask AI</span>
+</a>
+</div>
+<div class="mt-auto p-4 border-t border-white/10">
+<div class="bg-white/10 rounded-2xl p-4 mb-4 backdrop-blur-md border border-white/10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-bold text-white/70 uppercase">Crawl Usage</span>
+<span class="text-[9px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full">Free</span>
+</div>
+<div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden mb-3">
+<div class="h-full bg-white" style="width: 82%"></div>
+</div>
+<button class="w-full bg-white/20 hover:bg-white/30 text-white py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10">Upgrade Account</button>
+</div>
+<div class="flex items-center gap-3 px-2">
+<div class="relative w-9 h-9 rounded-full overflow-hidden border border-white/20 shadow-sm">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV4xJgihMYAi_mmDShZ7deHUp-LUOeIkdigZlzSlvKPLJrvDyrg8xEOZZ2bDlkw7CNPtv46itC0yUZCxYTLS9GMCRd46a-PnH5PFDlJeIeVbWsI8he0YXTZaEwU6-cijuZsRwHPTd40KByKRITuRRspSeH9LOsDyHknt4JUlZpQSZrW8kWbfk0CkCJZPAikDgjML8Is-qgXAhxeSHDZF55K3MagPg3wgzqpRN7vUNS0XqfjpCEXb8-3pzl4E2oozcGfOPNew0jVw1e"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold text-white truncate">Alex Rivera</p>
+<p class="text-[10px] text-white/40 truncate">alex@sentientlog.io</p>
+</div>
+<button class="text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen" style="background-color: #f5f5f5; width: calc(100% - 256px);">
+<!-- TopAppBar -->
+<header class="h-16 flex justify-between items-center px-8 w-full border-b border-outline-variant/30 sticky top-0 bg-white/80 backdrop-blur-md z-40" id="TopAppBar">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[11px] font-bold text-emerald-700">Connected</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-3 py-1.5 text-error font-bold text-xs border border-error/20 hover:bg-error/5 transition-all rounded-lg">
+<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+                Clear Data
+            </button>
+<div class="h-6 w-[1px] bg-outline-variant/30 mx-1"></div>
+<button class="text-outline hover:text-primary transition-all p-2 rounded-full hover:bg-primary/5">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<button class="text-outline hover:text-primary transition-all p-2 rounded-full hover:bg-primary/5">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+</div>
+</header>
+<!-- Log Explorer Content -->
+<section class="p-8 space-y-6 w-full">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-2xl text-on-surface nb-heading">Log Explorer</h2>
+<p class="text-sm text-on-surface-variant/80 mt-1">Browse and filter your system events in real-time.</p>
+</div>
+<div class="flex items-center gap-3 pb-1">
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">Live Tail</span>
+<div class="w-10 h-5 bg-primary/20 rounded-full p-0.5 cursor-pointer flex justify-end relative">
+<div class="w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-surface-container-low rounded-xl p-2 flex items-center gap-3 border border-outline-variant/20 shadow-sm w-full">
+<div class="flex items-center pl-2">
+<span class="material-symbols-outlined text-outline text-[18px]">filter_alt</span>
+</div>
+<div class="flex-1 flex gap-2">
+<button class="flex items-center justify-between px-4 py-2 bg-paper-white rounded-lg border border-outline-variant/30 text-xs font-bold text-on-surface hover:border-primary/50 transition-all min-w-[140px]">
+<span class="">All Sources</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</button>
+<button class="flex items-center justify-between px-4 py-2 bg-paper-white rounded-lg border border-outline-variant/30 text-xs font-bold text-on-surface hover:border-primary/50 transition-all min-w-[140px]">
+<span class="">All Events</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</button>
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-white border border-outline-variant/30 rounded-lg text-xs font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Search URLs, IDs, or error codes..." type="text"/>
+</div>
+</div>
+<button class="px-5 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:brightness-110 transition-all flex items-center gap-2 shadow-md shadow-primary/10">
+<span class="material-symbols-outlined text-[16px]">download</span>
+                Export CSV
+            </button>
+</div>
+<!-- Logs Table -->
+<div class="bg-paper-white rounded-xl border border-outline-variant/20 shadow-sm overflow-hidden w-full">
+<div class="overflow-x-auto arctic-scroll">
+<table class="w-full text-left border-collapse table-fixed">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/10">
+<th class="w-[20%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading">Timestamp</th>
+<th class="w-[12%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading">Type</th>
+<th class="w-[30%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading">URL</th>
+<th class="w-[12%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading">Latency</th>
+<th class="w-[10%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading text-center">Status</th>
+<th class="w-[16%] px-2.5 py-3 text-[10px] font-bold text-outline uppercase tracking-[0.1em] nb-heading">Source</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5 text-on-surface">
+<!-- Sample Row with 10px padding -->
+<tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant">May 22, 09:06:59 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-primary font-medium truncate">/api/v1/analyze</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-error">12274ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium">—</td>
+</tr>
+<script>
+                            const tbody = document.querySelector('tbody');
+                            const rows = [
+                                { t: "May 22, 09:06:58 PM", type: "Api Call", url: "github.com/?locale=ja", latency: "922ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:57 PM", type: "Page View", url: "github.com/login", latency: "392ms", status: "200", source: "github.com", color: "primary" },
+                                { t: "May 22, 09:06:56 PM", type: "Api Call", url: "github.com/?locale=ko-kr", latency: "638ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:55 PM", type: "Api Call", url: "github.com/manifest.json", latency: "384ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:54 PM", type: "Page View", url: "github.com/features/copilot", latency: "722ms", status: "200", source: "github.com", color: "primary" },
+                                { t: "May 22, 09:06:53 PM", type: "Api Call", url: "github.com/features/spark", latency: "503ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:52 PM", type: "Api Call", url: "github.com/features/models", latency: "471ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:51 PM", type: "Page View", url: "github.com/mcp", latency: "773ms", status: "200", source: "github.com", color: "primary" },
+                                { t: "May 22, 09:06:50 PM", type: "Api Call", url: "github.com/features/actions", latency: "483ms", status: "200", source: "github.com", color: "tertiary" },
+                                { t: "May 22, 09:06:49 PM", type: "Api Call", url: "github.com/opensearch.xml", latency: "507ms", status: "200", source: "github.com", color: "tertiary" }
+                            ];
+
+                            rows.forEach(r => {
+                                const tr = document.createElement('tr');
+                                tr.className = "table-row-hover";
+                                const latencyInt = parseInt(r.latency);
+                                const latencyColor = latencyInt > 700 ? 'text-tertiary' : 'text-emerald-600';
+                                const typeClasses = r.color === 'tertiary' ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-primary-fixed text-on-primary-fixed-variant';
+                                
+                                tr.innerHTML = `
+                                    <td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">${r.t}</td>
+                                    <td class="px-2.5 py-2.5">
+                                        <span class="inline-flex px-2 py-0.5 ${typeClasses} text-[10px] font-bold rounded-md uppercase tracking-tight">${r.type}</span>
+                                    </td>
+                                    <td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">${r.url}</td>
+                                    <td class="px-2.5 py-2.5 text-xs font-bold ${latencyColor}">${r.latency}</td>
+                                    <td class="px-2.5 py-2.5 text-center">
+                                        <span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">${r.status}</span>
+                                    </td>
+                                    <td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">${r.source}</td>
+                                `;
+                                tbody.appendChild(tr);
+                            });
+                        </script><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:58 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/?locale=ja</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">922ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:57 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/login</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">392ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:56 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/?locale=ko-kr</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">638ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:55 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/manifest.json</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">384ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:54 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/copilot</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">722ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:53 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/spark</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">503ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:52 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/models</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">471ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:51 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/mcp</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">773ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:50 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/actions</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">483ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:49 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/opensearch.xml</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">507ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:58 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/?locale=ja</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">922ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:57 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/login</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">392ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:56 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/?locale=ko-kr</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">638ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:55 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/manifest.json</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">384ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:54 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/copilot</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">722ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:53 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/spark</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">503ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:52 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/models</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">471ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:51 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded-md uppercase tracking-tight">Page View</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/mcp</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-tertiary">773ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:50 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/features/actions</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">483ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr><tr class="table-row-hover">
+<td class="px-2.5 py-2.5 text-xs font-medium text-on-surface-variant/80">May 22, 09:06:49 PM</td>
+<td class="px-2.5 py-2.5">
+<span class="inline-flex px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-md uppercase tracking-tight">Api Call</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs font-mono text-on-surface-variant font-medium truncate">github.com/opensearch.xml</td>
+<td class="px-2.5 py-2.5 text-xs font-bold text-emerald-600">507ms</td>
+<td class="px-2.5 py-2.5 text-center">
+<span class="inline-flex px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded">200</span>
+</td>
+<td class="px-2.5 py-2.5 text-xs text-outline font-medium truncate">github.com</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant/10 bg-surface-container-low/30">
+<p class="text-[11px] font-bold text-outline tracking-wide">Showing 1-20 of 645 events</p>
+<div class="flex items-center gap-3">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 hover:bg-white text-outline disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-2 px-3">
+<span class="text-xs font-bold text-on-surface">Page 1</span>
+<span class="text-xs text-outline/60">of 33</span>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/20 hover:bg-white text-outline">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Toast Notification -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-3 bg-error text-on-error rounded-xl shadow-2xl z-[60] cursor-pointer hover:scale-105 transition-transform">
+<div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center font-black text-[10px]">N</div>
+<span class="text-xs font-bold uppercase tracking-tight">1 New Issue Detected</span>
+<div class="w-[1px] h-4 bg-white/20 mx-1"></div>
+<span class="material-symbols-outlined text-sm">close</span>
+</div>
+</section>
+</main>
+</body></html>

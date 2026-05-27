@@ -25,7 +25,7 @@ class BatchIngesterService {
   startFlushing() {
     if (this.intervalId) return;
     this.intervalId = setInterval(() => this.flush(), this.FLUSH_INTERVAL_MS);
-    console.log("✅ BatchIngester started");
+    console.log("[BatchIngester] started");
   }
 
   add(events) {
@@ -46,7 +46,7 @@ class BatchIngesterService {
     try {
       const Event = await getEventModel();
       await Event.insertMany(batch, { ordered: false });
-      console.log(`💾 Flushed ${batch.length} events`);
+      console.log(`[BatchIngester] Flushed ${batch.length} events`);
     } catch (err) {
       console.error("BatchIngester flush error:", err);
       this.buffer.unshift(...batch);

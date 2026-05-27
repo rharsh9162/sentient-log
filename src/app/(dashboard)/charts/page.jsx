@@ -20,11 +20,11 @@ import {
 import { Filter } from "lucide-react";
 
 const PIE_COLORS = [
-  "#6366F1",
+  "#2563EB",
   "#22C55E",
   "#EF4444",
   "#F59E0B",
-  "#8B5CF6",
+  "#3B82F6",
   "#06B6D4",
 ];
 

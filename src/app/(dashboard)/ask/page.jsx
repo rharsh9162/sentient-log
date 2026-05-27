@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { queryAI, getStats } from "@/lib/api";
-import { Send, Loader2, Bot, User, Filter } from "lucide-react";
+import { ArrowUp, Loader2, Bot, User, Filter, Search, AlertTriangle } from "lucide-react";
 
 const SUGGESTIONS = [
   "What are the top 5 most visited pages?",
@@ -55,8 +55,13 @@ export default function AskPage() {
         ...prev,
         {
           role: "ai",
-          content: `⚠️ ${message}. Make sure your Gemini API key is configured in .env.local`,
-        },
+          content: (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <AlertTriangle size={16} />
+              <span>{message}. Make sure your Gemini API key is configured in .env.local</span>
+            </div>
+          ),
+        }
       ]);
     } finally {
       setLoading(false);
@@ -117,8 +122,9 @@ export default function AskPage() {
               <h3>Ask your logs anything</h3>
               <p>Powered by Gemini AI · MongoDB data</p>
               {domain && (
-                <p style={{ fontSize: 12, color: "#7C3AED", marginTop: 4 }}>
-                  🔍 Filtered to: <strong>{domain}</strong>
+                <p style={{ fontSize: 12, color: "#2563EB", marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Search size={12} />
+                  <span>Filtered to: <strong>{domain}</strong></span>
                 </p>
               )}
               <div className="chat-suggestions">
@@ -191,7 +197,7 @@ export default function AskPage() {
                 <Loader2
                   size={15}
                   className="animate-spin"
-                  style={{ color: "#7C3AED" }}
+                  style={{ color: "#2563EB" }}
                 />
                 <span>Thinking...</span>
               </div>
@@ -208,12 +214,16 @@ export default function AskPage() {
               style={{
                 padding: "6px 16px",
                 fontSize: 11,
-                color: "#7C3AED",
-                background: "rgba(139,92,246,0.08)",
-                borderBottom: "1px solid rgba(139,92,246,0.15)",
+                color: "#2563EB",
+                background: "rgba(37,99,235,0.08)",
+                borderBottom: "1px solid rgba(37,99,235,0.15)",
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
               }}
             >
-              🔍 Questions will be scoped to <strong>{domain}</strong>
+              <Search size={14} />
+              <span>Questions will be scoped to <strong>{domain}</strong></span>
             </div>
           )}
           <div className="chat-input-row">
@@ -236,9 +246,9 @@ export default function AskPage() {
               disabled={!input.trim() || loading}
             >
               {loading ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 size={18} className="animate-spin" />
               ) : (
-                <Send size={16} />
+                <ArrowUp size={20} strokeWidth={2.5} />
               )}
             </button>
           </div>

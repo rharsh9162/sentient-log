@@ -58,7 +58,7 @@ export async function POST(_req) {
     await Event.insertMany(events);
 
     return NextResponse.json({
-      message: `✅ Seeded ${events.length} events for your account`,
+      message: `Successfully seeded ${events.length} events for your account`,
       count: events.length,
     });
   } catch (error) {

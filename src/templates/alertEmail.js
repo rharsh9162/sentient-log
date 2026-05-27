@@ -9,10 +9,10 @@ export function getAlertEmailHtml(data) {
 <div style="max-width:560px;margin:24px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
 
   <!-- Header -->
-  <div style="background:linear-gradient(135deg,#7C3AED,#4F46E5);padding:28px 32px">
+  <div style="background:linear-gradient(135deg,#7C3AED,#1D4ED8);padding:28px 32px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
-        <span style="font-size:16px;color:#fff">⚡</span>
+        <span style="font-size:16px;color:#fff;font-weight:bold;">!</span>
       </div>
       <span style="font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);letter-spacing:.02em">SentientLog</span>
     </div>
@@ -23,7 +23,7 @@ export function getAlertEmailHtml(data) {
   <!-- Content -->
   <div style="padding:28px 32px">
     <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,0.08);color:#991B1B;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;margin-bottom:8px">
-      🔔 ${ruleName}
+      [ALERT] ${ruleName}
     </div>
     <div style="font-size:12px;color:#64748B;margin-bottom:16px">fired at ${timeStr}</div>
 
@@ -60,7 +60,7 @@ export function getAlertEmailHtml(data) {
     <div style="height:1px;background:#E2E8F0;margin:20px 0"></div>
 
     <div style="margin-bottom:24px">
-      <a href="#" style="display:inline-block;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#ffffff;font-size:14px;font-weight:500;padding:12px 24px;border-radius:10px;text-decoration:none">View in SentientLog</a>
+      <a href="#" style="display:inline-block;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#ffffff;font-size:14px;font-weight:500;padding:12px 24px;border-radius:10px;text-decoration:none">View in SentientLog</a>
     </div>
 
     <div style="background:#F8FAFC;border-radius:10px;padding:12px 16px;font-size:12px;color:#64748B;line-height:1.6">

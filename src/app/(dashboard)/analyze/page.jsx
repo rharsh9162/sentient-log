@@ -5,8 +5,9 @@ import { analyzeWebsite } from "@/lib/api";
 import {
   Globe,
   Loader2,
-  Zap,
+  Sparkles,
   AlertTriangle,
+  Search,
 } from "lucide-react";
 import AnalyzeResults from "@/components/analyze/AnalyzeResults";
 
@@ -36,7 +37,7 @@ export default function AnalyzePage() {
     setLoading(true);
     setError("");
     setResult(null);
-    setProgress("🔍 Crawling website... this may take 15-30 seconds");
+    setProgress("Crawling website... this may take 15-30 seconds");
 
     try {
       const data = await analyzeWebsite(analyzeUrl, maxPages);
@@ -140,29 +141,30 @@ export default function AnalyzePage() {
             disabled={loading || !url.trim()}
             style={{
               height: 46,
-              padding: "0 24px",
+              padding: "0 28px",
               background: loading
                 ? "rgba(203, 213, 225, 0.4)"
-                : "linear-gradient(135deg, #6366F1, #8B5CF6)",
+                : "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
               color: loading ? "#475569" : "#fff",
-              border: "none",
-              borderRadius: 10,
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
               cursor: loading ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
               gap: 8,
-              transition: "all 0.2s ease",
+              transition: "all 0.3s ease",
+              boxShadow: loading ? "none" : "0 4px 14px rgba(37,99,235,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
               opacity: loading || !url.trim() ? 0.6 : 1,
             }}
           >
             {loading ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={18} className="animate-spin" />
             ) : (
-              <Zap size={16} />
+              <Sparkles size={18} />
             )}
-            {loading ? "Analyzing..." : "Analyze"}
+            {loading ? "Analyzing..." : "Analyze Site"}
           </button>
         </div>
 
@@ -185,7 +187,7 @@ export default function AnalyzePage() {
                   background: "rgba(99, 102, 241, 0.1)",
                   border: "1px solid rgba(99, 102, 241, 0.2)",
                   borderRadius: 20,
-                  color: "#818CF8",
+                  color: "#60A5FA",
                   fontSize: 12,
                   fontWeight: 500,
                   cursor: loading ? "not-allowed" : "pointer",
@@ -205,9 +207,12 @@ export default function AnalyzePage() {
           <Loader2
             size={24}
             className="animate-spin"
-            style={{ color: "#818CF8", margin: "0 auto 12px" }}
+            style={{ color: "#60A5FA", margin: "0 auto 12px" }}
           />
-          <p style={{ color: "#94A3B8", fontSize: 14 }}>{progress}</p>
+          <div style={{ color: "#94A3B8", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <Search size={16} />
+            <span>{progress}</span>
+          </div>
           <div
             style={{
               marginTop: 12,
