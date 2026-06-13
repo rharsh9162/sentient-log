@@ -43,7 +43,7 @@ export function Sidebar() {
       {/* Icon Rail (Always Visible) */}
       <div className="sidebar-rail">
         <div className="sidebar-logo-icon" style={{ padding: '4px', background: 'transparent', border: 'none' }}>
-          <Image src="/logo-v4.jpg" alt="SentientLog" width={32} height={32} style={{ objectFit: 'contain', borderRadius: '8px' }} />
+          <Image src="/logo.png" alt="SentientLog" width={32} height={32} style={{ objectFit: 'contain', borderRadius: '8px' }} />
         </div>
         
         <div className="sidebar-rail-icons">

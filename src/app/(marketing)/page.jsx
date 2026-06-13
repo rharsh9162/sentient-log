@@ -13,7 +13,7 @@ export default function LandingPage() {
       <nav className="landing-nav">
         <div className="landing-nav-logo">
           <div className="landing-logo-icon" style={{ background: 'transparent', boxShadow: 'none' }}>
-            <img src="/logo-v4.jpg" alt="SentientLog Icon" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }} />
+            <img src="/logo.png" alt="SentientLog Icon" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }} />
           </div>
           <span className="landing-logo-text">SentientLog</span>
         </div>

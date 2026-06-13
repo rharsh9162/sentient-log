@@ -42,3 +42,13 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# stitch html files
+stitch_alerts.html
+stitch_analyze.html
+stitch_ask.html
+stitch_charts.html
+stitch_dashboard.html
+stitch_landing.html
+stitch_logs.html
+error.html
