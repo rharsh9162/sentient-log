@@ -50,6 +50,16 @@ export async function POST(req) {
     await connectDB();
     await Event.insertMany(taggedEvents, { ordered: false });
 
+    // Broadcast to live stream via Socket.IO if it's available in this process (HTTP Fallback)
+    if (global.io) {
+      const dashNs = global.io.of("/dashboard");
+      for (const evt of taggedEvents) {
+        if (evt.user_id) {
+          dashNs.to(evt.user_id).emit("event:new", evt);
+        }
+      }
+    }
+
     const res = NextResponse.json(
       { accepted: taggedEvents.length },
       { status: 202 },

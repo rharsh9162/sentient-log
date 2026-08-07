@@ -137,6 +137,9 @@ app.prepare().then(async () => {
     path: "/socket.io",
   });
 
+  // Expose io globally so Next.js API routes (HTTP fallback) can broadcast events
+  global.io = io;
+
   // ── Stream Namespace ──
   const trackerNs = io.of("/stream");
 
