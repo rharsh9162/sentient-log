@@ -123,4 +123,64 @@ User question: ${question}`;
       }
     }
   }
+
+  async getInsights(domain, userId) {
+    await connectDB();
+    const baseFilter = userId ? { user_id: userId } : {};
+    if (domain) baseFilter["metadata.domain"] = domain;
+
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
+    const [todayEvents, yesterdayEvents, todayErrors, yesterdayErrors, topUrls] = await Promise.all([
+      Event.countDocuments({ ...baseFilter, timestamp: { $gte: oneDayAgo } }),
+      Event.countDocuments({ ...baseFilter, timestamp: { $gte: twoDaysAgo, $lt: oneDayAgo } }),
+      Event.countDocuments({ ...baseFilter, event_type: "error", timestamp: { $gte: oneDayAgo } }),
+      Event.countDocuments({ ...baseFilter, event_type: "error", timestamp: { $gte: twoDaysAgo, $lt: oneDayAgo } }),
+      Event.aggregate([
+        { $match: { ...baseFilter, timestamp: { $gte: oneDayAgo } } },
+        { $group: { _id: "$url", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 3 },
+      ])
+    ]);
+
+    const statsData = {
+      todayEvents,
+      yesterdayEvents,
+      todayErrors,
+      yesterdayErrors,
+      topUrls: topUrls.map(u => ({ url: u._id, count: u.count }))
+    };
+
+    const prompt = `You are an AI analytics assistant. Given the following stats for a website over the last 24 hours (compared to the previous 24 hours), generate exactly 5 short, insightful bullet points.
+Format as a JSON array of strings. Do not include markdown or explanations. Make the insights actionable or interesting (e.g., "Traffic increased by X%", "Errors spiked..."). Keep them very concise.
+Stats: ${JSON.stringify(statsData)}`;
+
+    const model = this.genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.3,
+      },
+    });
+
+    try {
+      const result = await model.generateContent([prompt]);
+      let cleanText = result.response.text().trim();
+      if (cleanText.startsWith("\`\`\`")) {
+        cleanText = cleanText.replace(/^\`\`\`(?:json)?\n?/, "").replace(/\n?\`\`\`$/, "");
+      }
+      const insights = JSON.parse(cleanText);
+      if (!Array.isArray(insights)) throw new Error("Not an array");
+      return insights;
+    } catch (e) {
+      console.error("AI Insights Error:", e);
+      return [
+        "Unable to generate insights at this time.",
+        "Ensure your Gemini API key is properly configured.",
+      ];
+    }
+  }
 }

@@ -2,32 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getStats } from "@/lib/api";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { SkeletonChart } from "@/components/ui/Skeleton";
 import { Filter } from "lucide-react";
-
-const PIE_COLORS = [
-  "#2563EB",
-  "#22C55E",
-  "#EF4444",
-  "#F59E0B",
-  "#3B82F6",
-  "#06B6D4",
-];
-
+import { useSocket } from "@/components/providers/SocketProvider";
 import OverviewTab from "@/components/charts/OverviewTab";
 import LatencyTab from "@/components/charts/LatencyTab";
 import ErrorsTab from "@/components/charts/ErrorsTab";
@@ -38,6 +15,8 @@ export default function ChartsPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [domain, setDomain] = useState("");
 
+  const { socket } = useSocket();
+
   const fetchData = useCallback(() => {
     setLoading(true);
     getStats(domain || undefined)
@@ -46,9 +25,29 @@ export default function ChartsPage() {
       .finally(() => setLoading(false));
   }, [domain]);
 
+  // Initial load
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Live: refetch stats when new events come in (debounced)
+  useEffect(() => {
+    if (!socket) return;
+    let debounce = null;
+
+    const handleNewEvent = () => {
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        fetchData();
+      }, 3000); // Debounce 3s to avoid hammering DB
+    };
+
+    socket.on("event:new", handleNewEvent);
+    return () => {
+      socket.off("event:new", handleNewEvent);
+      if (debounce) clearTimeout(debounce);
+    };
+  }, [socket, fetchData]);
 
   const tabs = [
     { key: "overview", label: "Overview" },
@@ -68,19 +67,7 @@ export default function ChartsPage() {
     itemStyle: { color: "#7C3AED" },
   };
 
-  if (loading) {
-    return (
-      <div className="animate-fade-in">
-        <div className="page-header">
-          <h1 className="page-title">Charts</h1>
-          <p className="page-subtitle">Visual analytics of your event data</p>
-        </div>
-        <div className="spinner-page">
-          <div className="spinner" />
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div
@@ -138,7 +125,9 @@ export default function ChartsPage() {
         ))}
       </div>
 
-      {!stats || stats.total_events === 0 ? (
+      {loading ? (
+        <SkeletonChart />
+      ) : !stats || stats.total_events === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: 80 }}>
           <p style={{ color: "#64748B", fontSize: 15 }}>
             No event data available. Seed some data from the Overview page.

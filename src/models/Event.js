@@ -5,7 +5,12 @@ const EventSchema = new Schema(
     event_type: {
       type: String,
       required: true,
-      enum: ["page_view", "click", "error", "api_call"],
+      enum: [
+        "page_view",
+        "click",
+        "error",
+        "api_call",
+      ],
     },
     url: { type: String, required: true },
     latency_ms: { type: Number, required: true },

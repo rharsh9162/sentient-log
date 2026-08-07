@@ -1,31 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { UserButton, useClerk } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { getHealth, clearData } from "@/lib/api";
-import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { UserButton } from "@clerk/nextjs";
+import { clearData } from "@/lib/api";
+import { Trash2, Users } from "lucide-react";
+import { useSocket } from "@/components/providers/SocketProvider";
 
 export function Navbar() {
-  const { signOut } = useClerk();
-  const router = useRouter();
-  const [status, setStatus] = useState("checking");
+  const { isConnected, visitors } = useSocket();
   const [clearing, setClearing] = useState(false);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const data = await getHealth();
-        setStatus(data.db === "connected" ? "connected" : "disconnected");
-      } catch {
-        setStatus("disconnected");
-      }
-    };
-    check();
-    const interval = setInterval(check, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleClear = async (action) => {
     const label =
@@ -51,14 +34,16 @@ export function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-status">
-        <span className={`navbar-status-dot ${status}`} />
+        <span className={`navbar-status-dot ${isConnected ? "connected" : "disconnected"}`} />
         <span>
-          {status === "connected"
-            ? "Connected"
-            : status === "disconnected"
-              ? "Offline"
-              : "Connecting..."}
+          {isConnected ? "Live" : "Offline"}
         </span>
+        {isConnected && visitors.total > 0 && (
+          <span className="navbar-visitors-badge">
+            <Users size={12} />
+            {visitors.total}
+          </span>
+        )}
       </div>
 
       <div className="navbar-right">

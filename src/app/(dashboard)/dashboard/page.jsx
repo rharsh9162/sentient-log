@@ -14,6 +14,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { SkeletonChart } from "@/components/ui/Skeleton";
+import AIInsightsPopup from "@/components/dashboard/AIInsightsPopup";
 import { useAuth } from "@clerk/nextjs";
 
 export default function OverviewPage() {
@@ -148,6 +150,7 @@ export default function OverviewPage() {
               </select>
             </div>
           )}
+          <AIInsightsPopup domain={domain} />
         </div>
       </div>
 
@@ -186,7 +189,7 @@ export default function OverviewPage() {
           >
             <div className="spinner" />
           </div>
-        ) : stats && stats.events_per_hour.length > 0 ? (
+        ) : stats?.events_per_hour?.length > 0 ? (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={stats.events_per_hour}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
@@ -257,7 +260,7 @@ export default function OverviewPage() {
             >
               <div className="spinner" />
             </div>
-          ) : stats && stats.top_urls.length > 0 ? (
+          ) : stats?.top_urls?.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={stats.top_urls} layout="vertical">
                 <CartesianGrid
@@ -328,7 +331,7 @@ export default function OverviewPage() {
             >
               <div className="spinner" />
             </div>
-          ) : stats && stats.event_type_breakdown.length > 0 ? (
+          ) : stats?.event_type_breakdown?.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {stats.event_type_breakdown.map(({ type, count }) => {
                 const max = Math.max(

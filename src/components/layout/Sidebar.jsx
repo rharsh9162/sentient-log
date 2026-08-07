@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSocket } from "@/components/providers/SocketProvider";
 import {
   LayoutDashboard,
   ScrollText,
@@ -13,11 +14,13 @@ import {
   Bell,
   ChevronLeft,
   Settings,
-  UserCircle
+  UserCircle,
+  Radio,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/stream", label: "Live Stream", icon: Radio },
   { href: "/analyze", label: "Analyze Site", icon: Globe },
   { href: "/logs", label: "Logs", icon: ScrollText },
   { href: "/charts", label: "Charts", icon: BarChart3 },
@@ -28,6 +31,7 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
+  const { isConnected } = useSocket();
 
   return (
     <aside className="sidebar">
@@ -87,6 +91,9 @@ export function Sidebar() {
               >
                 <Icon size={17} />
                 {label}
+                {label === "Live Stream" && isConnected && (
+                  <span className="live-dot" style={{ marginLeft: "auto" }} />
+                )}
               </Link>
             );
           })}

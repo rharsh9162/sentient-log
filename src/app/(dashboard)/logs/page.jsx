@@ -9,6 +9,7 @@ import {
   Filter,
   Download,
 } from "lucide-react";
+import { SkeletonTableRow } from "@/components/ui/Skeleton";
 
 export default function LogsPage() {
   const [events, setEvents] = useState([]);
@@ -184,33 +185,35 @@ export default function LogsPage() {
       </div>
 
       {/* Table */}
-      {loading ? (
-        <div className="spinner-page">
-          <div className="spinner" />
-        </div>
-      ) : events.length === 0 ? (
-        <div className="card" style={{ textAlign: "center", padding: 60 }}>
-          <p style={{ color: "#64748B", fontSize: 15 }}>
-            No events found. Try adjusting your filters or analyze a website
-            first.
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="data-table-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>Type</th>
-                  <th>URL</th>
-                  <th>Latency</th>
-                  <th>Status</th>
-                  <th>Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((event) => (
+      <div className="data-table-wrap">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Type</th>
+              <th>URL</th>
+              <th>Latency</th>
+              <th>Status</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <>
+                <tr><td colSpan={6} style={{ padding: '8px' }}><SkeletonTableRow /></td></tr>
+                <tr><td colSpan={6} style={{ padding: '8px' }}><SkeletonTableRow /></td></tr>
+                <tr><td colSpan={6} style={{ padding: '8px' }}><SkeletonTableRow /></td></tr>
+                <tr><td colSpan={6} style={{ padding: '8px' }}><SkeletonTableRow /></td></tr>
+                <tr><td colSpan={6} style={{ padding: '8px' }}><SkeletonTableRow /></td></tr>
+              </>
+            ) : events.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ textAlign: "center", padding: 60, color: "#64748B" }}>
+                  No events found. Try adjusting your filters or analyze a website first.
+                </td>
+              </tr>
+            ) : (
+              events.map((event) => (
                   <React.Fragment key={event._id}>
                     <tr
                       onClick={() =>
@@ -304,8 +307,9 @@ export default function LogsPage() {
                       </tr>
                     )}
                   </React.Fragment>
-                ))}
-              </tbody>
+                ))
+              )}
+            </tbody>
             </table>
           </div>
 
@@ -335,8 +339,6 @@ export default function LogsPage() {
               </button>
             </div>
           </div>
-        </>
-      )}
     </div>
   );
 }

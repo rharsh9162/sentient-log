@@ -38,9 +38,6 @@ export async function getStats(domain) {
   return fetchAPI(`/api/v1/stats${params}`);
 }
 
-export async function getHealth() {
-  return fetchAPI("/api/v1/health");
-}
 
 export async function queryAI(question, domain) {
   return fetchAPI("/api/v1/query", {
@@ -49,9 +46,6 @@ export async function queryAI(question, domain) {
   });
 }
 
-export async function seedData() {
-  return fetchAPI("/api/v1/seed", { method: "POST" });
-}
 
 export async function clearData(action) {
   return fetchAPI("/api/v1/clear", {
