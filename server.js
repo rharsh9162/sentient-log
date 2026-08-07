@@ -126,6 +126,72 @@ app.prepare().then(async () => {
 
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
+
+    // ── Natively Handle HTTP Fallback Ingest ──
+    // Bypassing Next.js API route ensures we don't hit worker isolation limits
+    // and guarantees direct access to the Socket.IO instance for Live Stream broadcasting.
+    if (parsedUrl.pathname === '/api/v1/ingest') {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+      if (req.method === 'OPTIONS') {
+        res.statusCode = 200;
+        return res.end();
+      }
+
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+          try {
+            const data = JSON.parse(body);
+            const events = data.events || [];
+            if (!events.length) {
+              res.statusCode = 400;
+              return res.end(JSON.stringify({ error: "events required" }));
+            }
+
+            const siteId = parsedUrl.query.siteId;
+            const Event = getEventModel();
+            
+            const taggedEvents = events.map(e => ({
+              ...e,
+              user_id: siteId || undefined,
+              timestamp: e.timestamp || new Date()
+            }));
+
+            await Event.insertMany(taggedEvents, { ordered: false });
+
+            // Broadcast to live stream
+            const dashNs = io.of("/dashboard");
+            const usersToUpdate = new Set();
+            for (const evt of taggedEvents) {
+              if (evt.user_id) {
+                dashNs.to(evt.user_id).emit("event:new", evt);
+                usersToUpdate.add(evt.user_id);
+              }
+            }
+
+            // Schedule visitors update
+            for (const uid of usersToUpdate) {
+              scheduleStatsBroadcast(dashNs, uid);
+            }
+
+            res.statusCode = 202;
+            res.setHeader("Content-Type", "application/json");
+            return res.end(JSON.stringify({ accepted: taggedEvents.length }));
+          } catch (e) {
+            console.error("[Stream] HTTP fallback error:", e.message);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            return res.end(JSON.stringify({ error: "Internal Server Error" }));
+          }
+        });
+        return;
+      }
+    }
+
     handle(req, res, parsedUrl);
   });
 
