@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }) {
       <div className="dashboard-layout">
         {userId && (
           <Script 
-            src="/tracker.js" 
+            src="/script.js" 
             data-internal="true" 
             data-site-id={userId} 
             strategy="afterInteractive" 

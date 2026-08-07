@@ -137,11 +137,11 @@ app.prepare().then(async () => {
     path: "/socket.io",
   });
 
-  // ── Tracker Namespace ──
-  const trackerNs = io.of("/tracker");
+  // ── Stream Namespace ──
+  const trackerNs = io.of("/stream");
 
   trackerNs.on("connection", (socket) => {
-    console.log(`[Tracker] connected: ${socket.id}`);
+    console.log(`[Stream] connected: ${socket.id}`);
 
     socket.on("event", async (data) => {
       try {
@@ -155,9 +155,9 @@ app.prepare().then(async () => {
         }));
 
         // Save to DB
-        console.log(`[Tracker] inserting ${taggedEvents.length} events for user ${taggedEvents[0]?.user_id}`);
+        console.log(`[Stream] inserting ${taggedEvents.length} events for user ${taggedEvents[0]?.user_id}`);
         await Event.insertMany(taggedEvents, { ordered: false });
-        console.log(`[Tracker] successfully inserted ${taggedEvents.length} events`);
+        console.log(`[Stream] successfully inserted ${taggedEvents.length} events`);
 
         // Update active visitor tracking
         for (const evt of taggedEvents) {
@@ -186,7 +186,7 @@ app.prepare().then(async () => {
           scheduleStatsBroadcast(dashNs, uid);
         }
       } catch (err) {
-        console.error("[Tracker] event handling error:", err.message);
+        console.error("[Stream] event handling error:", err.message);
       }
     });
 

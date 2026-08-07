@@ -173,7 +173,7 @@ export default function LandingPage() {
 <span className="code-tag">&lt;html</span> <span className="code-attr">lang</span>=<span className="code-string">"en"</span><span className="code-tag">&gt;</span>{`\n`}
 <span className="code-tag">&lt;head&gt;</span>{`\n`}
   <span className="code-comment">&lt;!-- SentientLog Analytics Tracker --&gt;</span>{`\n`}
-  <span className="code-tag">&lt;script</span> <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-rho.vercel.app/tracker.js"</span>{`\n`}
+  <span className="code-tag">&lt;script</span> <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
           <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span> <span className="code-attr">defer</span><span className="code-tag">&gt;&lt;/script&gt;</span>{`\n`}
 <span className="code-tag">&lt;/head&gt;</span>{`\n`}
 <span className="code-tag">&lt;body&gt;</span>{`\n`}
@@ -207,7 +207,7 @@ export default function LandingPage() {
       <span className="code-tag">&lt;body&gt;</span>{`\n`}
         <span className="code-comment">{`{/* SentientLog Analytics Tracker */}`}</span>{`\n`}
         <span className="code-tag">&lt;Script</span>{`\n`}
-          <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-rho.vercel.app/tracker.js"</span>{`\n`}
+          <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
           <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span>{`\n`}
           <span className="code-attr">strategy</span>=<span className="code-string">"afterInteractive"</span>{`\n`}
         <span className="code-tag">/&gt;</span>{`\n`}

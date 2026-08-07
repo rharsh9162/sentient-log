@@ -4,7 +4,7 @@
 
 **AI-powered web observability & analytics platform**
 
-[Live Demo](https://sentient-log-rho.vercel.app/) · [Report Bug](https://github.com/rharsh9162/sentient-log/issues) · [Request Feature](https://github.com/rharsh9162/sentient-log/issues)
+[Live Demo](https://sentient-log-yvg1.onrender.com/) · [Report Bug](https://github.com/rharsh9162/sentient-log/issues) · [Request Feature](https://github.com/rharsh9162/sentient-log/issues)
 
 <br/>
 
@@ -49,7 +49,7 @@ The core of SentientLog is a lightweight JavaScript SDK served from the platform
 ```html
 <!-- Works with any HTML site or MERN app -->
 <script
-  src="https://sentient-log-rho.vercel.app/tracker.js"
+  src="https://sentient-log-yvg1.onrender.com/script.js"
   data-site-id="YOUR_ACCOUNT_ID"
   defer>
 </script>
@@ -65,7 +65,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Script
-          src="https://sentient-log-rho.vercel.app/tracker.js"
+          src="https://sentient-log-yvg1.onrender.com/script.js"
           data-site-id="YOUR_ACCOUNT_ID"
           strategy="afterInteractive"
         />
@@ -125,7 +125,7 @@ Once installed, the tracker automatically:
 | Background Jobs | Inngest |
 | Email | Resend |
 | HTTP Client | Axios |
-| Deployment | Vercel |
+| Deployment | Render |
 
 ---
 
@@ -210,10 +210,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Deployment
 
-SentientLog is deployed on [Vercel](https://vercel.com). Add all environment variables to your Vercel project settings before deploying.
+SentientLog is deployed on [Render](https://render.com). Add all environment variables to your Render Web Service settings before deploying.
 
 ```bash
-vercel --prod
+npm run build && npm start
 ```
 
 ---

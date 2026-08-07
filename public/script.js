@@ -14,7 +14,8 @@
 
   const scriptTag =
     document.currentScript ||
-    document.querySelector('script[src*="tracker.js"]');
+    document.querySelector('script[src*="script.js"]') ||
+    document.querySelector('script[data-site-id]');
   const siteId = scriptTag ? scriptTag.getAttribute("data-site-id") : null;
   const isInternal = scriptTag
     ? scriptTag.hasAttribute("data-internal")
@@ -167,7 +168,7 @@
         return;
       }
 
-      socket = io(`${scriptOrigin}/tracker`, {
+      socket = io(`${scriptOrigin}/stream`, {
         query: { siteId: siteId || "" },
         transports: ["websocket", "polling"],
         reconnection: true,
