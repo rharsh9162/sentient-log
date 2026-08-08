@@ -56,7 +56,7 @@
     fetch(ingestUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ events: batch }),
+      body: JSON.stringify({ events: batch, siteId: siteId || "" }),
       keepalive: true,
     }).catch(() => {});
   }

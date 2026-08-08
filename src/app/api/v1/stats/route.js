@@ -3,6 +3,8 @@ import { connectDB } from "@/lib/db";
 import { Event } from "@/models/Event";
 import { getUserId } from "@/lib/getUser";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req) {
   try {
     await connectDB();

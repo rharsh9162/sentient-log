@@ -127,43 +127,43 @@ app.prepare().then(async () => {
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
 
-    // ── Natively Handle HTTP Fallback Ingest ──
-    // Bypassing Next.js API route ensures we don't hit worker isolation limits
-    // and guarantees direct access to the Socket.IO instance for Live Stream broadcasting.
-    if (parsedUrl.pathname === '/api/v1/ingest') {
+    // Natively intercept HTTP fallback ingest
+    if (parsedUrl.pathname === "/api/v1/ingest") {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
       res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-      if (req.method === 'OPTIONS') {
-        res.statusCode = 200;
-        return res.end();
+      if (req.method === "OPTIONS") {
+        res.writeHead(200);
+        res.end();
+        return;
       }
 
-      if (req.method === 'POST') {
-        let body = '';
-        req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', async () => {
+      if (req.method === "POST") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); });
+        req.on("end", async () => {
           try {
             const data = JSON.parse(body);
-            const events = data.events || [];
-            if (!events.length) {
-              res.statusCode = 400;
-              return res.end(JSON.stringify({ error: "events required" }));
+            const events = data.events;
+            if (!Array.isArray(events) || events.length === 0) {
+              res.writeHead(400);
+              res.end(JSON.stringify({ error: "events array required" }));
+              return;
             }
 
-            const siteId = parsedUrl.query.siteId;
+            const targetUserId = data.siteId || parsedUrl.query.siteId;
             const Event = getEventModel();
             
-            const taggedEvents = events.map(e => ({
+            const taggedEvents = events.map((e) => ({
               ...e,
-              user_id: siteId || undefined,
-              timestamp: e.timestamp || new Date()
+              timestamp: e.timestamp || new Date(),
+              user_id: e.user_id || targetUserId || undefined,
             }));
 
             await Event.insertMany(taggedEvents, { ordered: false });
 
-            // Broadcast to live stream
+            // Broadcast to dashboard namespace natively
             const dashNs = io.of("/dashboard");
             const usersToUpdate = new Set();
             for (const evt of taggedEvents) {
@@ -173,19 +173,16 @@ app.prepare().then(async () => {
               }
             }
 
-            // Schedule visitors update
             for (const uid of usersToUpdate) {
               scheduleStatsBroadcast(dashNs, uid);
             }
 
-            res.statusCode = 202;
-            res.setHeader("Content-Type", "application/json");
-            return res.end(JSON.stringify({ accepted: taggedEvents.length }));
-          } catch (e) {
-            console.error("[Stream] HTTP fallback error:", e.message);
-            res.statusCode = 500;
-            res.setHeader("Content-Type", "application/json");
-            return res.end(JSON.stringify({ error: "Internal Server Error" }));
+            res.writeHead(202, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ accepted: taggedEvents.length }));
+          } catch (err) {
+            console.error("[Ingest] error:", err);
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: "Internal Server Error" }));
           }
         });
         return;
