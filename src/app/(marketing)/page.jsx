@@ -45,16 +45,16 @@ export default function LandingPage() {
           {/* Dashboard Preview Image */}
           <div className="landing-preview-wrapper" style={{ padding: '0 20px', marginTop: '40px', maxWidth: '1000px', margin: '40px auto 0' }}>
             <div className="landing-preview-glass" style={{ padding: '12px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(16px)', borderRadius: '24px' }}>
-              <img 
-                src="/dashboard-preview.png" 
-                alt="SentientLog Dashboard Preview" 
-                style={{ 
-                  width: '100%', 
-                  height: 'auto', 
+              <img
+                src="/dashboard-preview.png"
+                alt="SentientLog Dashboard Preview"
+                style={{
+                  width: '100%',
+                  height: 'auto',
                   borderRadius: '16px',
                   display: 'block',
                   boxShadow: '0 12px 48px rgba(31, 38, 135, 0.15), 0 1px 3px rgba(255,255,255,0.5) inset'
-                }} 
+                }}
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function LandingPage() {
           <p className="section-subheading">
             SentientLog acts as your intelligent co-pilot, automatically tracking what matters and notifying you before things break.
           </p>
-          
+
           <div className="features-grid">
             <div className="landing-card">
               <div className="card-icon green"><Zap size={28} /></div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        
+
         {/* Documentation / Integration Guide */}
         <section className="landing-section docs-section">
           <h2 className="section-heading">Integration Guide</h2>
@@ -146,7 +146,7 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "40px", width: "100%", maxWidth: "800px", margin: "0 auto" }}>
-            
+
             {/* HTML / MERN Snippet */}
             <div>
               <h3 style={{ fontSize: "18px", color: "var(--text)", marginBottom: "16px", textAlign: "left" }}>For Standard HTML / MERN Apps:</h3>
@@ -162,17 +162,17 @@ export default function LandingPage() {
                 </div>
                 <pre className="code-block">
                   <code>
-<span className="code-tag">&lt;!DOCTYPE html&gt;</span>{`\n`}
-<span className="code-tag">&lt;html</span> <span className="code-attr">lang</span>=<span className="code-string">"en"</span><span className="code-tag">&gt;</span>{`\n`}
-<span className="code-tag">&lt;head&gt;</span>{`\n`}
-  <span className="code-comment">&lt;!-- SentientLog Analytics Tracker --&gt;</span>{`\n`}
-  <span className="code-tag">&lt;script</span> <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
-          <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span> <span className="code-attr">defer</span><span className="code-tag">&gt;&lt;/script&gt;</span>{`\n`}
-<span className="code-tag">&lt;/head&gt;</span>{`\n`}
-<span className="code-tag">&lt;body&gt;</span>{`\n`}
-  <span className="code-tag">&lt;h1&gt;</span>Hello World!<span className="code-tag">&lt;/h1&gt;</span>{`\n`}
-<span className="code-tag">&lt;/body&gt;</span>{`\n`}
-<span className="code-tag">&lt;/html&gt;</span>
+                    <span className="code-tag">&lt;!DOCTYPE html&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;html</span> <span className="code-attr">lang</span>=<span className="code-string">"en"</span><span className="code-tag">&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;head&gt;</span>{`\n`}
+                    <span className="code-comment">&lt;!-- SentientLog Analytics Tracker --&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;script</span> <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
+                    <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span> <span className="code-attr">defer</span><span className="code-tag">&gt;&lt;/script&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;/head&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;body&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;h1&gt;</span>Hello World!<span className="code-tag">&lt;/h1&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;/body&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;/html&gt;</span>
                   </code>
                 </pre>
               </div>
@@ -193,22 +193,22 @@ export default function LandingPage() {
                 </div>
                 <pre className="code-block">
                   <code>
-<span className="code-tag">import</span> Script <span className="code-tag">from</span> <span className="code-string">"next/script"</span>;{`\n\n`}
-<span className="code-tag">export default function</span> <span className="code-attr">RootLayout</span>({`{ children }`}) {`{\n`}
-  <span className="code-tag">return</span> ({`\n`}
-    <span className="code-tag">&lt;html</span> <span className="code-attr">lang</span>=<span className="code-string">"en"</span><span className="code-tag">&gt;</span>{`\n`}
-      <span className="code-tag">&lt;body&gt;</span>{`\n`}
-        <span className="code-comment">{`{/* SentientLog Analytics Tracker */}`}</span>{`\n`}
-        <span className="code-tag">&lt;Script</span>{`\n`}
-          <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
-          <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span>{`\n`}
-          <span className="code-attr">strategy</span>=<span className="code-string">"afterInteractive"</span>{`\n`}
-        <span className="code-tag">/&gt;</span>{`\n`}
-        {`{children}\n`}
-      <span className="code-tag">&lt;/body&gt;</span>{`\n`}
-    <span className="code-tag">&lt;/html&gt;</span>{`\n`}
-  );{`\n`}
-{`}`}
+                    <span className="code-tag">import</span> Script <span className="code-tag">from</span> <span className="code-string">"next/script"</span>;{`\n\n`}
+                    <span className="code-tag">export default function</span> <span className="code-attr">RootLayout</span>({`{ children }`}) {`{\n`}
+                    <span className="code-tag">return</span> ({`\n`}
+                    <span className="code-tag">&lt;html</span> <span className="code-attr">lang</span>=<span className="code-string">"en"</span><span className="code-tag">&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;body&gt;</span>{`\n`}
+                    <span className="code-comment">{`{/* SentientLog Analytics Tracker */}`}</span>{`\n`}
+                    <span className="code-tag">&lt;Script</span>{`\n`}
+                    <span className="code-attr">src</span>=<span className="code-string">"https://sentient-log-yvg1.onrender.com/script.js"</span>{`\n`}
+                    <span className="code-attr">data-site-id</span>=<span className="code-string">"YOUR_ACCOUNT_ID"</span>{`\n`}
+                    <span className="code-attr">strategy</span>=<span className="code-string">"afterInteractive"</span>{`\n`}
+                    <span className="code-tag">/&gt;</span>{`\n`}
+                    {`{children}\n`}
+                    <span className="code-tag">&lt;/body&gt;</span>{`\n`}
+                    <span className="code-tag">&lt;/html&gt;</span>{`\n`}
+                    );{`\n`}
+                    {`}`}
                   </code>
                 </pre>
               </div>
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
           </div>
         </section>
-        
+
         {/* Final CTA */}
         <section className="landing-section final-cta">
           <h2 className="section-heading">Ready to gain full visibility?</h2>
