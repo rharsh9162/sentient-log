@@ -126,69 +126,6 @@ app.prepare().then(async () => {
 
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
-
-    // Natively intercept HTTP fallback ingest
-    if (parsedUrl.pathname === "/api/v1/ingest") {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-      if (req.method === "OPTIONS") {
-        res.writeHead(200);
-        res.end();
-        return;
-      }
-
-      if (req.method === "POST") {
-        let body = "";
-        req.on("data", chunk => { body += chunk.toString(); });
-        req.on("end", async () => {
-          try {
-            const data = JSON.parse(body);
-            const events = data.events;
-            if (!Array.isArray(events) || events.length === 0) {
-              res.writeHead(400);
-              res.end(JSON.stringify({ error: "events array required" }));
-              return;
-            }
-
-            const targetUserId = data.siteId || parsedUrl.query.siteId;
-            const Event = getEventModel();
-            
-            const taggedEvents = events.map((e) => ({
-              ...e,
-              timestamp: e.timestamp || new Date(),
-              user_id: e.user_id || targetUserId || undefined,
-            }));
-
-            await Event.insertMany(taggedEvents, { ordered: false });
-
-            // Broadcast to dashboard namespace natively
-            const dashNs = io.of("/dashboard");
-            const usersToUpdate = new Set();
-            for (const evt of taggedEvents) {
-              if (evt.user_id) {
-                dashNs.to(evt.user_id).emit("event:new", evt);
-                usersToUpdate.add(evt.user_id);
-              }
-            }
-
-            for (const uid of usersToUpdate) {
-              scheduleStatsBroadcast(dashNs, uid);
-            }
-
-            res.writeHead(202, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ accepted: taggedEvents.length }));
-          } catch (err) {
-            console.error("[Ingest] error:", err);
-            res.writeHead(500);
-            res.end(JSON.stringify({ error: "Internal Server Error" }));
-          }
-        });
-        return;
-      }
-    }
-
     handle(req, res, parsedUrl);
   });
 
@@ -199,9 +136,6 @@ app.prepare().then(async () => {
     },
     path: "/socket.io",
   });
-
-  // Expose io globally so Next.js API routes (HTTP fallback) can broadcast events
-  global.io = io;
 
   // ── Stream Namespace ──
   const trackerNs = io.of("/stream");

@@ -56,18 +56,9 @@
     fetch(ingestUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ events: batch, siteId: siteId || "" }),
+      body: JSON.stringify({ events: batch }),
       keepalive: true,
     }).catch(() => {});
-  }
-
-  function enableHttpFallback() {
-    useHttpFallback = true;
-    if (offlineQueue.length > 0) {
-      httpBuffer.push(...offlineQueue);
-      offlineQueue.length = 0;
-      httpScheduleFlush();
-    }
   }
 
   function httpScheduleFlush() {
@@ -173,7 +164,7 @@
     ioScript.onload = () => {
       if (typeof io === "undefined") {
         console.warn("SentientLog: Socket.IO client failed to initialize. Using HTTP fallback.");
-        enableHttpFallback();
+        useHttpFallback = true;
         return;
       }
 
@@ -196,17 +187,12 @@
 
       socket.on("connect_error", () => {
         socketConnected = false;
-        // If Socket.IO fails to connect at all, fallback to HTTP
-        if (!socket.connected) {
-           console.warn("SentientLog: Socket.IO connection error. Using HTTP fallback.");
-           enableHttpFallback();
-        }
       });
     };
 
     ioScript.onerror = () => {
       console.warn("SentientLog: Could not load Socket.IO. Using HTTP fallback.");
-      enableHttpFallback();
+      useHttpFallback = true;
     };
 
     document.head.appendChild(ioScript);
