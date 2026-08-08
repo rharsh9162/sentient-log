@@ -4,10 +4,6 @@ import { XCircle, Zap, Bot, Bell, MousePointerClick } from "lucide-react";
 export default function LandingPage() {
   return (
     <div className="landing-page">
-      {/* Decorative Orbs */}
-      <div className="landing-orb orb-1" />
-      <div className="landing-orb orb-2" />
-      <div className="landing-orb orb-3" />
 
       {/* Navbar */}
       <nav className="landing-nav">
@@ -31,13 +27,10 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="landing-section hero-section">
           <h1 className="landing-title">
-            Supercharge your observability with{" "}
-            <span className="text-gradient">AI-driven</span> analytics.
+            Web observability, <span className="text-gradient">simplified.</span>
           </h1>
           <p className="landing-subtitle">
-            Let AI illuminate your sales journey, system events, and log tracking.
-            Analyze trends and stay in command with a sleek, insight-driven
-            dashboard.
+            Track page views, monitor API latency, and catch errors in real-time with a single script tag.
           </p>
 
           <div className="landing-cta">
