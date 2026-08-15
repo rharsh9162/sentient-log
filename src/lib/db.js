@@ -10,8 +10,7 @@ export async function connectDB() {
   if (mongoose.connection.readyState === 1) return mongoose;
 
   if (cached.conn) {
-    cached.conn = null;
-    cached.promise = null;
+    return cached.conn;
   }
 
   if (!cached.promise) {
@@ -24,7 +23,6 @@ export async function connectDB() {
       .catch((err) => {
         console.error("[DB] MongoDB connection failed:", err.message);
         cached.promise = null;
-        cached.conn = null;
         throw err;
       });
   }

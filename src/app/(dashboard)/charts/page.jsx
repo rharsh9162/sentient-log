@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { getStats } from "@/lib/api";
 import { SkeletonChart } from "@/components/ui/Skeleton";
-import { Filter } from "lucide-react";
 import { useSocket } from "@/components/providers/SocketProvider";
 import OverviewTab from "@/components/charts/OverviewTab";
 import LatencyTab from "@/components/charts/LatencyTab";
 import ErrorsTab from "@/components/charts/ErrorsTab";
+import PageHeader from "@/components/shared/PageHeader";
 
 export default function ChartsPage() {
   const [stats, setStats] = useState(null);
@@ -67,50 +67,18 @@ export default function ChartsPage() {
     itemStyle: { color: "#7C3AED" },
   };
 
-
-
   return (
     <div
       className="animate-fade-in"
       style={{ display: "flex", flexDirection: "column", gap: 24 }}
     >
-      <div
-        className="page-header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <div>
-          <h1 className="page-title">Charts</h1>
-          <p className="page-subtitle">
-            {domain
-              ? `Showing data for ${domain}`
-              : "Visual analytics of your event data"}
-          </p>
-        </div>
-        {stats?.domains && stats.domains.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Filter size={14} style={{ color: "#64748B" }} />
-            <select
-              className="filter-select"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              style={{ minWidth: 180 }}
-            >
-              <option value="">All Sources</option>
-              {stats.domains.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
+      <PageHeader 
+        title="Charts"
+        subtitle="Visual analytics of your event data"
+        domain={domain}
+        setDomain={setDomain}
+        domains={stats?.domains || []}
+      />
 
       {/* Tabs */}
       <div className="chart-tabs">

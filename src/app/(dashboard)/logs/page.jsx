@@ -6,10 +6,10 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Download,
 } from "lucide-react";
 import { SkeletonTableRow } from "@/components/ui/Skeleton";
+import PageHeader from "@/components/shared/PageHeader";
 
 export default function LogsPage() {
   const [events, setEvents] = useState([]);
@@ -106,35 +106,19 @@ export default function LogsPage() {
       className="animate-fade-in"
       style={{ display: "flex", flexDirection: "column", gap: 20 }}
     >
-      <div className="page-header">
-        <h1 className="page-title">Log Explorer</h1>
-        <p className="page-subtitle">
-          {domain ? `Filtered: ${domain}` : "Browse and filter your event logs"}
-        </p>
-      </div>
+      <PageHeader 
+        title="Log Explorer"
+        subtitle="Browse and filter your event logs"
+        domain={domain}
+        setDomain={(newDomain) => {
+          setDomain(newDomain);
+          setPage(1);
+        }}
+        domains={domains}
+      />
 
       {/* Filters */}
       <div className="filters-bar">
-        {domains.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Filter size={14} style={{ color: "#64748B" }} />
-            <select
-              className="filter-select"
-              value={domain}
-              onChange={(e) => {
-                setDomain(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="">All Sources</option>
-              {domains.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         <select
           className="filter-select"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, X, Loader2 } from "lucide-react";
+import axios from "axios";
 
 export default function AIInsightsPopup({ domain }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,9 +30,8 @@ export default function AIInsightsPopup({ domain }) {
     setLoading(true);
     try {
       const url = domain ? `/api/v1/ai/insights?domain=${encodeURIComponent(domain)}` : "/api/v1/ai/insights";
-      const res = await fetch(url);
-      const data = await res.json();
-      setInsights(data.insights || ["No insights available."]);
+      const res = await axios.get(url);
+      setInsights(res.data.insights || ["No insights available."]);
     } catch (e) {
       console.error(e);
       setInsights(["Failed to load insights."]);
