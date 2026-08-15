@@ -9,16 +9,16 @@
  * <script src="/tracker.js" data-internal="true" defer></script>
  */
 
-(function () {
-  if (typeof window === "undefined") return;
+(function () { // Immediately Invoked Function Expression --> The function is created and immediately executed.
+  if (typeof window === "undefined") return;  // If this isn't a browser environment, stop executing
 
   const scriptTag =
-    document.currentScript ||
-    document.querySelector('script[src*="script.js"]') ||
-    document.querySelector('script[data-site-id]');
+    document.currentScript ||  // refers to the <script> currently executing
+    document.querySelector('script[src*="script.js"]') ||  // searches the page for a <script> whose src contains: script.js
+    document.querySelector('script[data-site-id]'); // searches for any script having: data-site-id
   const siteId = scriptTag ? scriptTag.getAttribute("data-site-id") : null;
   const isInternal = scriptTag
-    ? scriptTag.hasAttribute("data-internal")
+    ? scriptTag.hasAttribute("data-internal")  // Your own dashboard loads the same tracker
     : false;
   let scriptOrigin = window.location.origin;
   if (scriptTag && scriptTag.src) {
@@ -38,13 +38,14 @@
 
   // ── Session ──
   const SESSION_ID = `sess_${Math.random().toString(36).substring(2, 10)}`;
+  // The purpose is to associate several events with the same browsing session. // refreshing the page can create a new session ID.
 
   // ── Offline Queue ──
-  const offlineQueue = [];
+  const offlineQueue = [];    // Stores events when Socket.IO isn't connected yet.  // Then when Socket.IO connects -> flushOfflineQueue() sends everything.
   let socketConnected = false;
   let socket = null;
 
-  // ── HTTP Fallback (used if Socket.IO fails to load) ──
+  // ── HTTP Fallback (used if Socket.IO fails to load) ── USE HTTP POST 
   const ingestUrl = `${scriptOrigin}/api/v1/ingest?siteId=${siteId || ""}`;
   let useHttpFallback = false;
   const httpBuffer = [];
@@ -52,15 +53,17 @@
 
   function httpFlush() {
     if (httpBuffer.length === 0) return;
-    const batch = httpBuffer.splice(0);
+    const batch = httpBuffer.splice(0);  // empty the httpBuffer and assign its value to batch
     fetch(ingestUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },  // So this header is important because it says: “the body is JSON”
       body: JSON.stringify({ events: batch }),
-      keepalive: true,
-    }).catch(() => {});
+      keepalive: true,  // This tells the browser to try to keep the request alive even around page termination.
+    }).catch(() => { });
   }
 
+  // You don't send every event immediately.
+  // events can accumulate for 2 seconds.
   function httpScheduleFlush() {
     if (httpFlushTimer) return;
     httpFlushTimer = setTimeout(() => {
@@ -69,7 +72,7 @@
     }, 2000);
   }
 
-  // ── Utilities ──
+  // ── Browser detection ──
   function getBrowserName() {
     const ua = navigator.userAgent;
     if (ua.includes("Firefox")) return "Firefox";
@@ -87,7 +90,7 @@
   }
 
   function getReferrerSource() {
-    const ref = document.referrer;
+    const ref = document.referrer; // tells you which page the visitor came from
     if (!ref) return "direct";
     try {
       const hostname = new URL(ref).hostname;

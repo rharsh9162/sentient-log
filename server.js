@@ -1,76 +1,26 @@
-const { createServer } = require("http");
-const { parse } = require("url");
-const next = require("next");
-const { Server } = require("socket.io");
-const mongoose = require("mongoose");
+/* This is the main runtime entry point of the app.
+The reason this app needs a custom server is Socket.IO. Next.js handles pages and API routes, but this project also needs real-time WebSocket communication for live analytics.
+  At a high level, server.js does 5 jobs:
+    Starts a Next.js app.
+    Creates a normal Node HTTP server.
+    Connects to MongoDB.
+    Attaches Socket.IO.
+    Moves events from browser trackers to dashboards in real time.
+*/
+
+import { createServer } from "http"; // creates the underlying Node HTTP server.
+import { parse } from "url"; // parses incoming request URLs.
+import next from "next"; // starts the Next.js app.
+import { Server } from "socket.io"; // creates the Socket.IO server.
+import { connectDB } from "./src/lib/db.js"; // connects to MongoDB.
+import { Event } from "./src/models/Event.js"; // defines and uses the Event model.
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "0.0.0.0";
+const hostname = "0.0.0.0"; // means the server listens on all network interfaces, not just localhost.
 const port = parseInt(process.env.PORT, 10) || 3000;
 
-const app = next({ dev, hostname, port });
-const handle = app.getRequestHandler();
-
-// ── MongoDB connection (reuses the same approach as lib/db.js) ──
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/sentient_log";
-
-let dbReady = false;
-
-async function connectMongo() {
-  if (dbReady && mongoose.connection.readyState === 1) return;
-  try {
-    await mongoose.connect(MONGODB_URI, { dbName: "sentient_log" });
-    dbReady = true;
-    console.log("[Server] MongoDB connected");
-  } catch (err) {
-    console.error("[Server] MongoDB connection failed:", err.message);
-    dbReady = false;
-  }
-}
-
-// ── Event model (inline to avoid ESM import issues in CJS server) ──
-let EventModel;
-
-function getEventModel() {
-  if (EventModel) return EventModel;
-
-  // Reuse existing model if already registered (hot reload safety)
-  if (mongoose.models.Event) {
-    EventModel = mongoose.models.Event;
-    return EventModel;
-  }
-
-  const EventSchema = new mongoose.Schema(
-    {
-      event_type: {
-        type: String,
-        required: true,
-        enum: [
-          "page_view",
-          "click",
-          "error",
-          "api_call",
-        ],
-      },
-      url: { type: String, required: true },
-      latency_ms: { type: Number, required: true },
-      status_code: { type: Number },
-      metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
-      session_id: { type: String },
-      user_id: { type: String, index: true },
-      timestamp: { type: Date, default: Date.now },
-    },
-    { timestamps: false }
-  );
-
-  EventSchema.index({ timestamp: -1 });
-  EventSchema.index({ url: 1 });
-  EventSchema.index({ event_type: 1 });
-
-  EventModel = mongoose.model("Event", EventSchema);
-  return EventModel;
-}
+const app = next({ dev, hostname, port }); // app is the Next.js application instance.
+const handle = app.getRequestHandler(); // handle is Next’s request handler. Whenever a normal HTTP request comes in, this handler decides what to do.
 
 // ── Active visitors tracking ──
 const activeVisitors = new Map(); // socketId -> { userId, sessionId, lastSeen, device, page }
@@ -122,7 +72,11 @@ function scheduleStatsBroadcast(dashboardNamespace, userId) {
 
 // ── Boot ──
 app.prepare().then(async () => {
-  await connectMongo();
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error("[Server] MongoDB connection failed initially. The server will still start:", err.message);
+  }
 
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
@@ -145,7 +99,6 @@ app.prepare().then(async () => {
 
     socket.on("event", async (data) => {
       try {
-        const Event = getEventModel();
         const events = Array.isArray(data) ? data : [data];
 
         const taggedEvents = events.map((e) => ({
