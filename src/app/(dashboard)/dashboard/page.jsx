@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getStats } from "@/lib/api";
+import axios from "axios";
 import { useAuth } from "@clerk/nextjs";
 import { useSocket } from "@/components/providers/SocketProvider";
 import PageHeader from "@/components/shared/PageHeader";
@@ -17,7 +17,9 @@ export default function OverviewPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const data = await getStats(domain || undefined);
+      const { data } = await axios.get("/api/v1/stats", {
+        params: domain ? { domain } : {},
+      });
       setStats(data);
     } catch (err) {
       console.error("Failed to fetch stats:", err);

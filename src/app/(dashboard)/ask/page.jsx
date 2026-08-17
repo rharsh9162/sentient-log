@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { queryAI, getStats } from "@/lib/api";
+import axios from "axios";
 import { ArrowUp, Loader2, Bot, User, Filter, Search, AlertTriangle } from "lucide-react";
 
 const SUGGESTIONS = [
@@ -23,8 +23,8 @@ export default function AskPage() {
 
   // Fetch available domains
   useEffect(() => {
-    getStats()
-      .then((s) => setDomains(s.domains || []))
+    axios.get("/api/v1/stats")
+      .then((res) => setDomains(res.data.domains || []))
       .catch(() => {});
   }, []);
 
@@ -39,7 +39,7 @@ export default function AskPage() {
     setMessages((prev) => [...prev, { role: "user", content: displayQ }]);
     setLoading(true);
     try {
-      const data = await queryAI(question, domain || undefined);
+      const { data } = await axios.post("/api/v1/query", { question, domain: domain || undefined });
       setMessages((prev) => [
         ...prev,
         {
@@ -49,8 +49,7 @@ export default function AskPage() {
         },
       ]);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
+      const message = err.response?.data?.error || "Something went wrong";
       setMessages((prev) => [
         ...prev,
         {

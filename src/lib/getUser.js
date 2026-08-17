@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";  // This imports Clerk’s server-side auth helper.
 
 /**
  * Extract the authenticated user's ID via Clerk.

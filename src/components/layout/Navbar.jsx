@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
-import { clearData } from "@/lib/api";
+import axios from "axios";
 import { Trash2, Users } from "lucide-react";
 import { useSocket } from "@/components/providers/SocketProvider";
 
@@ -21,11 +21,11 @@ export function Navbar() {
       return;
     setClearing(true);
     try {
-      const result = await clearData(action);
-      alert(result.message);
+      const { data } = await axios.post("/api/v1/clear", { action });
+      alert(data.message);
       window.location.reload();
-    } catch {
-      alert("Failed to clear data");
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to clear data");
     } finally {
       setClearing(false);
     }

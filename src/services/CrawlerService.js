@@ -1,10 +1,16 @@
 import axios from "axios";
 
-// Extract all links from HTML
+// Find links inside the HTML and return valid same-site page links.
 export function extractLinks(html, baseUrl) {
+// this func recieves html -> raw html test of a page & baseURL -> the page url where that HTML came from 
   const linkRegex = /href\s*=\s*["']([^"'#]+?)["']/gi;
+  // This is a regular expression.
+// It looks for HTML attributes like:
+      // href="/pricing"
+      // href="https://example.com/contact"
+      // href='about
   const links = new Set();
-  let match;
+  let match;   // This variable will hold each regex match while looping.
 
   while ((match = linkRegex.exec(html)) !== null) {
     try {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, Fragment } from "react";
-import { getLogs, getStats } from "@/lib/api";
+import axios from "axios";
 import {
   Search,
   ChevronLeft,
@@ -27,20 +27,22 @@ export default function LogsPage() {
 
   // Fetch available domains once
   useEffect(() => {
-    getStats()
-      .then((s) => setDomains(s.domains || []))
+    axios.get("/api/v1/stats")
+      .then((res) => setDomains(res.data.domains || []))
       .catch(() => {});
   }, []);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getLogs({
-        page,
-        limit,
-        event_type: eventType || undefined,
-        search: search || undefined,
-        domain: domain || undefined,
+      const { data } = await axios.get("/api/v1/logs", {
+        params: {
+          page,
+          limit,
+          event_type: eventType || undefined,
+          search: search || undefined,
+          domain: domain || undefined,
+        }
       });
       setEvents(data.events);
       setTotal(data.total);

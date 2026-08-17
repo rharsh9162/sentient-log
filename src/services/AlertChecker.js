@@ -23,7 +23,7 @@ export async function computeMetric(metric, domain, userId, frequency) {
     case "avg_latency": {
       const result = await Event.aggregate([
         { $match: baseFilter },
-        { $group: { _id: null, avg: { $avg: "$latency_ms" } } },
+        { $group: { _id: null, avg: { $avg: "$latency_ms" } } },  // Group all matching events together and calculate average latency.
       ]);
       return result[0]?.avg || 0;
     }
@@ -70,9 +70,11 @@ export function isDueForCheck(lastCheckedAt, frequency) {
 
 export async function runAlertChecks(userId) {
   const query = userId ? { user_id: userId, enabled: true } : { enabled: true };
+  // Manual "Check Now" button -> current user only
+  // Scheduled Inngest cron    -> all users
   const enabledAlerts = await Alert.find(query);
 
-  const results = [];
+  const results = [];   //This array will store the result of each alert check.
 
   // Get users for email lookup if not provided
   let allUsers = [];
@@ -166,6 +168,7 @@ export async function runAlertChecks(userId) {
         threshold: alert.threshold,
         firedAt: now,
         frequency: alert.frequency,
+        condition: alert.condition,
       });
     }
 

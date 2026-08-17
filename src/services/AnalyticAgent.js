@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Gemini SDK
 import { connectDB } from "@/lib/db";
 import { Event } from "@/models/Event";
 
@@ -19,6 +19,13 @@ const ALLOWED_OPERATORS = [
   "$last",
   "$skip",
 ];
+// This is a safety list.
+// The AI will generate a MongoDB aggregation pipeline.
+// But you do not want AI to generate dangerous operations like:
+//     $merge
+//     $out
+//     $function
+//     because those can modify data, write collections, or execute advanced logic.
 
 const SYSTEM_PROMPT = `You are an expert MongoDB query builder for an analytics platform.
 The database has a single collection called "events" with this schema:
@@ -41,13 +48,15 @@ Always include a $limit stage (max 100).
 Use proper MongoDB date functions when filtering by time (e.g., $gte with ISODate-style new Date() strings).
 For domain-specific queries, filter using {"metadata.domain": "domain_name"}.`;
 
-export class AnalyticAgent {
+export class AnalyticAgent {  // This exports a class 
+// Other files create an instance like: const agent = new AnalyticAgent();
+// Then call: agent.query(...)  ,  agent.getInsights(...)
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not set in environment variables");
     }
-    this.genAI = new GoogleGenerativeAI(apiKey);
+    this.genAI = new GoogleGenerativeAI(apiKey);  // Creates a Gemini client and stores it on the class instance.
   }
 
   async query(question, domain, userId) {
@@ -62,7 +71,7 @@ User question: ${question}`;
     }
 
     const model = this.genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash",    // creates a Gemini model object
       generationConfig: {
         responseMimeType: "application/json",
         maxOutputTokens: 1000,
@@ -78,7 +87,7 @@ User question: ${question}`;
     const responseText = result.response.text();
 
     // Clean response — strip markdown fences if Gemini adds them
-    let cleanText = responseText.trim();
+    let cleanText = responseText.trim();   // Remove surrounding whitespace.
     if (cleanText.startsWith("```")) {
       cleanText = cleanText
         .replace(/^```(?:json)?\n?/, "")
@@ -87,7 +96,7 @@ User question: ${question}`;
 
     let parsed;
     try {
-      parsed = JSON.parse(cleanText);
+      parsed = JSON.parse(cleanText);  // This converts the JSON string into a JavaScript object.
     } catch {
       throw new Error(
         `Failed to parse AI response as JSON: ${cleanText.substring(0, 200)}`,
@@ -107,8 +116,10 @@ User question: ${question}`;
     if (userId) {
       pipeline.unshift({ $match: { user_id: userId } });
     }
+    // unshift inserts at the beginning of the array.
+    // So before running the AI-generated query, the app forces: { $match: { user_id: userId }  } as the first stage.
 
-    const results = await Event.aggregate(pipeline);
+    const results = await Event.aggregate(pipeline);  // This runs the pipeline against the events collection.
     return { question, pipeline, results, summary };
   }
 
@@ -117,7 +128,7 @@ User question: ${question}`;
       throw new Error("Pipeline must be an array");
     }
     for (const stage of pipeline) {
-      const key = Object.keys(stage)[0];
+      const key = Object.keys(stage)[0];  // For: { $match: { event_type: "error" } } key is:  "$match"
       if (!ALLOWED_OPERATORS.includes(key)) {
         throw new Error(`Disallowed pipeline operator: ${key}`);
       }
@@ -134,8 +145,8 @@ User question: ${question}`;
     const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
     const [todayEvents, yesterdayEvents, todayErrors, yesterdayErrors, topUrls] = await Promise.all([
-      Event.countDocuments({ ...baseFilter, timestamp: { $gte: oneDayAgo } }),
-      Event.countDocuments({ ...baseFilter, timestamp: { $gte: twoDaysAgo, $lt: oneDayAgo } }),
+      Event.countDocuments({ ...baseFilter, timestamp: { $gte: oneDayAgo } }), // last 24hr window 
+      Event.countDocuments({ ...baseFilter, timestamp: { $gte: twoDaysAgo, $lt: oneDayAgo } }),  // prev 24hr window
       Event.countDocuments({ ...baseFilter, event_type: "error", timestamp: { $gte: oneDayAgo } }),
       Event.countDocuments({ ...baseFilter, event_type: "error", timestamp: { $gte: twoDaysAgo, $lt: oneDayAgo } }),
       Event.aggregate([
@@ -169,7 +180,7 @@ Stats: ${JSON.stringify(statsData)}`;
     try {
       const result = await model.generateContent([prompt]);
       let cleanText = result.response.text().trim();
-      if (cleanText.startsWith("\`\`\`")) {
+      if (cleanText.startsWith("\`\`\`")) {  // Again removes Markdown fences if present.
         cleanText = cleanText.replace(/^\`\`\`(?:json)?\n?/, "").replace(/\n?\`\`\`$/, "");
       }
       const insights = JSON.parse(cleanText);

@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const AlertSchema = new Schema(
   {
     user_id: { type: String, required: true, index: true },
-    name: { type: String, required: true },
+    name: { type: String, required: true },  // This is the human-readable alert name.
     domain: { type: String, required: true },
     metric: {
       type: String,
@@ -23,7 +23,7 @@ const AlertSchema = new Schema(
       enum: ["15m", "daily", "weekly", "monthly"],
       default: "daily",
     },
-    enabled: { type: Boolean, default: true },
+    enabled: { type: Boolean, default: true },  // This controls whether the alert is active.
     last_fired_at: { type: Date, default: null },
     last_checked_at: { type: Date, default: null },
     total_firings: { type: Number, default: 0 },

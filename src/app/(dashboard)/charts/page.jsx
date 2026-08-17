@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getStats } from "@/lib/api";
+import axios from "axios";
 import { SkeletonChart } from "@/components/ui/Skeleton";
 import { useSocket } from "@/components/providers/SocketProvider";
 import OverviewTab from "@/components/charts/OverviewTab";
@@ -19,8 +19,8 @@ export default function ChartsPage() {
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    getStats(domain || undefined)
-      .then(setStats)
+    axios.get("/api/v1/stats", { params: domain ? { domain } : {} })
+      .then(res => setStats(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [domain]);

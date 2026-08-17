@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
+// Each document in this collection represents one alert firing.
 const AlertHistorySchema = new Schema(
   {
     alert_id: {
@@ -19,7 +20,7 @@ const AlertHistorySchema = new Schema(
   { timestamps: false },
 );
 
-AlertHistorySchema.index({ fired_at: -1 });
+AlertHistorySchema.index({ fired_at: -1 });  // This creates an index on fired_at, descending.
 
 export const AlertHistory =
   mongoose.models.AlertHistory ||

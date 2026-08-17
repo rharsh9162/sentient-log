@@ -1,15 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import {
-  getAlerts,
-  createAlert,
-  updateAlert,
-  deleteAlert,
-  getAlertHistory,
-  checkAlerts,
-  getStats,
-} from "@/lib/api";
+import axios from "axios";
 import {
   Bell,
   BellRing,
@@ -46,15 +38,15 @@ export default function AlertsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [alertsData, historyData, statsData] = await Promise.all([
-        getAlerts(),
-        getAlertHistory(),
-        getStats(),
+      const [alertsRes, historyRes, statsRes] = await Promise.all([
+        axios.get("/api/v1/alerts"),
+        axios.get("/api/v1/alerts/history"),
+        axios.get("/api/v1/stats"),
       ]);
-      setAlerts(alertsData.alerts);
-      setSummary(alertsData.summary);
-      setHistory(historyData.history);
-      setDomains(statsData.domains || []);
+      setAlerts(alertsRes.data.alerts);
+      setSummary(alertsRes.data.summary);
+      setHistory(historyRes.data.history);
+      setDomains(statsRes.data.domains || []);
     } catch (err) {
       console.error("Failed to fetch alerts data:", err);
     } finally {
@@ -69,9 +61,9 @@ export default function AlertsPage() {
   const handleCheck = async () => {
     setChecking(true);
     try {
-      const result = await checkAlerts();
-      if (result.fired > 0) {
-        alert(`${result.fired} alert(s) fired!`);
+      const { data } = await axios.post("/api/v1/alerts/check");
+      if (data.fired > 0) {
+        alert(`${data.fired} alert(s) fired!`);
       } else {
         alert("All clear — no alerts triggered.");
       }
@@ -85,7 +77,7 @@ export default function AlertsPage() {
 
   const handleToggle = async (id, currentEnabled) => {
     try {
-      await updateAlert(id, { enabled: !currentEnabled });
+      await axios.patch(`/api/v1/alerts/${id}`, { enabled: !currentEnabled });
       setAlerts((prev) =>
         prev.map((a) =>
           a._id === id ? { ...a, enabled: !currentEnabled } : a,
@@ -95,18 +87,18 @@ export default function AlertsPage() {
         ...prev,
         active: currentEnabled ? prev.active - 1 : prev.active + 1,
       }));
-    } catch {
-      alert("Failed to update alert");
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to update alert");
     }
   };
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this alert rule? This cannot be undone.")) return;
     try {
-      await deleteAlert(id);
+      await axios.delete(`/api/v1/alerts/${id}`);
       await fetchData();
-    } catch {
-      alert("Failed to delete alert");
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to delete alert");
     }
   };
 
@@ -124,14 +116,14 @@ export default function AlertsPage() {
     setFormLoading(true);
     try {
       if (editingRule) {
-        await updateAlert(editingRule._id, formData);
+        await axios.patch(`/api/v1/alerts/${editingRule._id}`, formData);
       } else {
-        await createAlert(formData);
+        await axios.post("/api/v1/alerts", formData);
       }
       resetForm();
       await fetchData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to save alert");
+      alert(err.response?.data?.error || "Failed to save alert");
     } finally {
       setFormLoading(false);
     }

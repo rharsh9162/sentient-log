@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { analyzeWebsite } from "@/lib/api";
+import axios from "axios";
 import {
   Globe,
   Loader2,
@@ -40,11 +40,11 @@ export default function AnalyzePage() {
     setProgress("Crawling website... this may take 15-30 seconds");
 
     try {
-      const data = await analyzeWebsite(analyzeUrl, maxPages);
+      const { data } = await axios.post("/api/v1/analyze", { url: analyzeUrl, maxPages });
       setResult(data);
       setProgress("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Analysis failed");
+      setError(err.response?.data?.error || "Analysis failed");
       setProgress("");
     } finally {
       setLoading(false);
