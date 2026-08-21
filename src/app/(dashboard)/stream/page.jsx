@@ -3,40 +3,59 @@
 import { useEffect, useState, useRef } from "react";
 import { useSocket } from "@/components/providers/SocketProvider";
 import { Radio, Filter, Pause, Play, Trash2 } from "lucide-react";
+import axios from "axios";
 
 export default function StreamPage() {
-  const { socket, isConnected } = useSocket();
-  const [events, setEvents] = useState([]);
-  const [isPaused, setIsPaused] = useState(false);
-  const [filterType, setFilterType] = useState("");
-  const feedRef = useRef(null);
-  const isPausedRef = useRef(false);
+  const { socket, isConnected } = useSocket();  // from the shared SocketProvider 
+  const [events, setEvents] = useState([]);  // live event list shown in the feed
+  const [isPaused, setIsPaused] = useState(false); // lets the user stop the feed from updating while still keeping the socket connection alive
+  const [filterType, setFilterType] = useState("");  // which filter is curr being selected 
+  const [domain, setDomain] = useState("");  // currently selected domain filter
+  const [domains, setDomains] = useState([]);  // list of available domains
+  const feedRef = useRef(null);  // feedRef is attached to the feed container. In this file it is not actively used for any scrolling logic, but it is there as a ref target
+
+  useEffect(() => {
+    axios.get("/api/v1/stats")
+      .then((res) => setDomains(res.data.domains || []))
+      .catch(() => {});
+  }, []);
+  const isPausedRef = useRef(false); // It mirrors isPaused so the socket event callback can always read the current paused state without stale closure problems
 
   // Keep ref in sync with state
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
+  // This is a classic pattern when an event listener needs access to a constantly changing React state value. The socket listener will read isPausedRef.current, which always has the latest value
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleNewEvent = (evt) => {
+    const handleNewEvent = (evt) => {  // Every time the server emits a new event, prepend it to the feed
       if (isPausedRef.current) return;
 
       setEvents((prev) => {
         const updated = [evt, ...prev];
-        if (updated.length > 200) updated.length = 200;
+        if (updated.length > 200) updated.length = 200; // keep only the most recent 200
         return updated;
       });
     };
 
-    socket.on("event:new", handleNewEvent);
-    return () => socket.off("event:new", handleNewEvent);
+    socket.on("event:new", handleNewEvent);  
+    // Register a listener for the "event:new" event
+    // That means the page is directly tied to the server-side broadcast in server.js:
+    //     dashNs.to(evt.user_id).emit("event:new", evt);
+            // So when the backend receives a tracked event, stores it in MongoDB, and pushes it to the dashboard room, this page catches it and renders it immediately
+    
+    
+    
+    return () => socket.off("event:new", handleNewEvent); // Clean up the listener when the component unmounts or the socket changes
   }, [socket]);
 
-  const filteredEvents = filterType
-    ? events.filter((e) => e.event_type === filterType)
-    : events;
+  const filteredEvents = events.filter((e) => {
+    if (filterType && e.event_type !== filterType) return false;
+    if (domain && e.metadata?.domain !== domain && e.metadata?.source !== domain) return false;
+    return true;
+  });
 
   function formatTime(ts) {
     const d = new Date(ts);
@@ -88,6 +107,23 @@ export default function StreamPage() {
         </div>
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {domains.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Filter size={14} style={{ color: "#64748B" }} />
+              <select
+                className="filter-select"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+              >
+                <option value="">All Sources</option>
+                {domains.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <select
             className="filter-select"
             value={filterType}
@@ -164,6 +200,10 @@ export default function StreamPage() {
               </div>
 
               <div className="stream-card-url">
+                <strong style={{ color: "#475569" }}>
+                  {evt.metadata?.domain || evt.metadata?.source || "Unknown Source"}
+                </strong>
+                {" · "}
                 {evt.url
                   ? new URL(evt.url, "http://localhost").pathname
                   : "—"}
@@ -217,3 +257,11 @@ export default function StreamPage() {
     </div>
   );
 }
+
+
+// The metadata section is useful because different event types carry different details. For example:
+// - page_view events might include device and browser
+// - api_call events include latency and method-related metadata
+// - error events may include a message
+
+

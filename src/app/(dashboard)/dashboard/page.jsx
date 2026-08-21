@@ -9,13 +9,14 @@ import KPICards from "@/components/dashboard/KPICards";
 import OverviewTab from "@/components/charts/OverviewTab";
 
 export default function OverviewPage() {
-  const { userId } = useAuth();
-  const { socket } = useSocket();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [domain, setDomain] = useState("");
+  const { userId } = useAuth();  //  This comes from Clerk authentication
+  const { socket } = useSocket(); // the page uses it to refersh stats when new events arrive 
+  const [stats, setStats] = useState(null);  // holds the analytics data returned from /api/v1/stats
+  const [loading, setLoading] = useState(true); // 
+  const [domain, setDomain] = useState("");  // This stores the currently selected domain filter
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const { data } = await axios.get("/api/v1/stats", {
         params: domain ? { domain } : {},
@@ -24,14 +25,19 @@ export default function OverviewPage() {
     } catch (err) {
       console.error("Failed to fetch stats:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [domain]);
+  
+  /*
+    Why useCallback?
+        // Because fetchStats depends on domain, React only recreates it when domain                 changes. That makes the effect logic cleaner and prevents unnecessary re-runs.  
+  */
 
-  useEffect(() => {
-    setLoading(true);
+  useEffect(() => {  
     fetchStats();
   }, [fetchStats]);
+  // on first render , stats are fetched and when the user changes its domain , stats are fetched again 
 
   // Live: refetch stats when new events come in (debounced)
   useEffect(() => {
@@ -41,7 +47,7 @@ export default function OverviewPage() {
     const handleNewEvent = () => {
       if (debounce) clearTimeout(debounce);
       debounce = setTimeout(() => {
-        fetchStats();
+        fetchStats(true);
       }, 3000); // Debounce 3s to avoid hammering DB
     };
 

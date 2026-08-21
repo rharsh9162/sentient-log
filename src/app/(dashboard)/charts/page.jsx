@@ -2,27 +2,29 @@
 
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { SkeletonChart } from "@/components/ui/Skeleton";
-import { useSocket } from "@/components/providers/SocketProvider";
+import { SkeletonChart } from "@/components/ui/Skeleton";  // loading placeholder while data is being fetched
+import { useSocket } from "@/components/providers/SocketProvider";  // gives access to the shared Socket.IO connection
 import OverviewTab from "@/components/charts/OverviewTab";
 import LatencyTab from "@/components/charts/LatencyTab";
 import ErrorsTab from "@/components/charts/ErrorsTab";
 import PageHeader from "@/components/shared/PageHeader";
 
 export default function ChartsPage() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [domain, setDomain] = useState("");
+  const [stats, setStats] = useState(null);  // holds the fetched analytics data
+  const [loading, setLoading] = useState(true);  // tracks whether stats are being fetched
+  const [activeTab, setActiveTab] = useState("overview");  // controls which chart section is visible
+  const [domain, setDomain] = useState("");  // stores the currently selected domain filter
 
-  const { socket } = useSocket();
+  const { socket } = useSocket();  // This pulls the Socket.IO client out of the app-wide socket provider
 
-  const fetchData = useCallback(() => {
-    setLoading(true);
+  const fetchData = useCallback((silent = false) => {
+    if (!silent) setLoading(true);
     axios.get("/api/v1/stats", { params: domain ? { domain } : {} })
       .then(res => setStats(res.data))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   }, [domain]);
 
   // Initial load
@@ -38,16 +40,25 @@ export default function ChartsPage() {
     const handleNewEvent = () => {
       if (debounce) clearTimeout(debounce);
       debounce = setTimeout(() => {
-        fetchData();
+        fetchData(true);
       }, 3000); // Debounce 3s to avoid hammering DB
     };
 
     socket.on("event:new", handleNewEvent);
+    //Whenever the socket receives an "event:new" message, the page waits 3 seconds and then refetches stats
     return () => {
-      socket.off("event:new", handleNewEvent);
-      if (debounce) clearTimeout(debounce);
+      socket.off("event:new", handleNewEvent);  // on cleanup , remove the socket listener 
+      if (debounce) clearTimeout(debounce);  // and clear the timer 
     };
   }, [socket, fetchData]);
+
+  /*
+      The socket is used only as a live-update trigger, not as the source of chart data.
+      So the socket acts like a notification:
+          new event arrives -> socket emits "event:new" -> page refetches /api/v1/stats
+      Without the socket, the charts still work, but they update only when the page loads or the domain filter changes. You can remove the socket code if live chart refresh is not needed.
+  */
+
 
   const tabs = [
     { key: "overview", label: "Overview" },
